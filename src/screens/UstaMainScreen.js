@@ -6,6 +6,7 @@ import {
   FlatList,
   TouchableOpacity,
   StyleSheet,
+  RefreshControl,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -18,6 +19,15 @@ import BottomNav from '../components/BottomNav';
 import SectionHeader from '../components/SectionHeader';
 import WorkDetailScreen from './WorkDetailScreen';
 import ClientProfileScreen from './ClientProfileScreen';
+import UstaProfileScreen from './UstaProfileScreen';
+import CategoryDetailScreen from './CategoryDetailScreen';
+import EarningsScreen from './EarningsScreen';
+import PaymentHistoryScreen from './PaymentHistoryScreen';
+import WithdrawScreen from './WithdrawScreen';
+import ReviewDetailSheet from '../components/ReviewDetailSheet';
+
+const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+const BALANCE = 1840000;
 
 const WEEK = [
   ['Du', 40],
@@ -55,9 +65,39 @@ const STATS = [
 ];
 
 const MY_CATEGORIES = [
-  { id: 1, name: 'Santexnika', icon: 'wrench', price: '80 000', isPrimary: true },
-  { id: 2, name: 'Isitish tizimlari', icon: 'radiator', price: '120 000', isPrimary: false },
-  { id: 3, name: "Konditsioner o'rnatish", icon: 'air-conditioner', price: '150 000', isPrimary: false },
+  {
+    id: 1,
+    name: 'Santexnika',
+    icon: 'wrench',
+    price: '80 000',
+    minPrice: '50 000',
+    priceType: 'Ish uchun',
+    experienceYears: 5,
+    negotiable: true,
+    isPrimary: true,
+  },
+  {
+    id: 2,
+    name: 'Isitish tizimlari',
+    icon: 'radiator',
+    price: '120 000',
+    minPrice: '90 000',
+    priceType: 'Ish uchun',
+    experienceYears: 3,
+    negotiable: false,
+    isPrimary: false,
+  },
+  {
+    id: 3,
+    name: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    price: '150 000',
+    minPrice: '100 000',
+    priceType: 'Ish uchun',
+    experienceYears: 4,
+    negotiable: true,
+    isPrimary: false,
+  },
 ];
 
 const CLIENTS = {
@@ -292,6 +332,7 @@ const MY_WORKS = [
 const MY_REVIEWS = [
   {
     id: 1,
+    workId: 1,
     name: 'Sardor Aliyev',
     rating: 5,
     time: '2 kun oldin',
@@ -299,6 +340,7 @@ const MY_REVIEWS = [
   },
   {
     id: 2,
+    workId: 2,
     name: 'Nodira Karimova',
     rating: 5,
     time: '1 hafta oldin',
@@ -306,6 +348,7 @@ const MY_REVIEWS = [
   },
   {
     id: 3,
+    workId: 3,
     name: 'Javlon Mirzayev',
     rating: 4,
     time: '2 hafta oldin',
@@ -324,15 +367,15 @@ const CAT_CARD_W = 132;
 const CAT_GAP = 10;
 const CAT_SLOT = CAT_CARD_W + CAT_GAP;
 
-function MyCategoriesSection({ t }) {
+function MyCategoriesSection({ t, categories, onSelect }) {
   const flatListRef = useRef(null);
   const indexRef = useRef(0);
-  const autoScroll = MY_CATEGORIES.length > 3;
+  const autoScroll = categories.length > 3;
 
   useEffect(() => {
     if (!autoScroll) return;
     const timer = setInterval(() => {
-      const next = (indexRef.current + 1) % MY_CATEGORIES.length;
+      const next = (indexRef.current + 1) % categories.length;
       indexRef.current = next;
       flatListRef.current?.scrollToOffset({
         offset: next * CAT_SLOT,
@@ -340,16 +383,16 @@ function MyCategoriesSection({ t }) {
       });
     }, 1800);
     return () => clearInterval(timer);
-  }, [autoScroll]);
+  }, [autoScroll, categories.length]);
 
   return (
     <View style={{ marginTop: 26 }}>
       <View style={{ paddingHorizontal: 20 }}>
-        <SectionHeader theme={t} title="Mening kategoriyalarim" action="Tahrirlash" />
+        <SectionHeader theme={t} title="Mening kategoriyalarim" />
       </View>
       <FlatList
         ref={flatListRef}
-        data={MY_CATEGORIES}
+        data={categories}
         keyExtractor={(c) => String(c.id)}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -357,7 +400,7 @@ function MyCategoriesSection({ t }) {
         decelerationRate="fast"
         contentContainerStyle={{ paddingHorizontal: 20, gap: CAT_GAP }}
         renderItem={({ item: c }) => (
-          <View
+          <TouchableOpacity
             style={[
               s.catCard,
               {
@@ -365,18 +408,23 @@ function MyCategoriesSection({ t }) {
                 borderColor: c.isPrimary ? t.orange : t.border,
               },
             ]}
+            activeOpacity={0.8}
+            onPress={() => onSelect?.(c)}
           >
-            <View
-              style={[
-                s.catIconBox,
-                { backgroundColor: c.isPrimary ? t.orange : t.rowIconBg },
-              ]}
-            >
-              <MaterialCommunityIcons
-                name={c.icon}
-                size={20}
-                color={c.isPrimary ? '#fff' : t.orange}
-              />
+            <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between' }}>
+              <View
+                style={[
+                  s.catIconBox,
+                  { backgroundColor: c.isPrimary ? t.orange : t.rowIconBg },
+                ]}
+              >
+                <MaterialCommunityIcons
+                  name={c.icon}
+                  size={20}
+                  color={c.isPrimary ? '#fff' : t.orange}
+                />
+              </View>
+              <Ionicons name="chevron-forward" size={15} color={t.faint} />
             </View>
             <Text
               style={{ fontSize: 12.5, fontWeight: '700', color: t.text }}
@@ -387,7 +435,7 @@ function MyCategoriesSection({ t }) {
             <Text style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>
               {c.price} so'mdan
             </Text>
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -419,7 +467,7 @@ function RecentWorksSection({ t, onSelect }) {
   return (
     <View style={{ marginTop: 26 }}>
       <View style={{ paddingHorizontal: 20 }}>
-        <SectionHeader theme={t} title="Oxirgi bajarilgan ishlar" action="Barchasi" />
+        <SectionHeader theme={t} title="Oxirgi bajarilgan ishlar" />
       </View>
       <FlatList
         ref={flatListRef}
@@ -482,11 +530,92 @@ const USTA_TABS = [
 
 export default function UstaMainScreen({ onLogout }) {
   const { theme: t } = useTheme();
-  const { user } = useUser();
+  const { user, refreshUser } = useUser();
   const [online, setOnline] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
   const [selectedWork, setSelectedWork] = useState(null);
   const [selectedClient, setSelectedClient] = useState(null);
+  const [selectedReview, setSelectedReview] = useState(null);
+  const [categories, setCategories] = useState(MY_CATEGORIES);
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [showEarnings, setShowEarnings] = useState(false);
+  const [showPaymentHistory, setShowPaymentHistory] = useState(false);
+  const [showWithdraw, setShowWithdraw] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refreshUser();
+    setRefreshing(false);
+  };
+
+  const selectedCategory = categories.find((c) => c.id === selectedCategoryId) || null;
+
+  const updateCategory = (id, updates) => {
+    setCategories((prev) =>
+      prev.map((c) => {
+        if (c.id === id) return { ...c, ...updates };
+        if (updates.isPrimary) return { ...c, isPrimary: false };
+        return c;
+      })
+    );
+  };
+
+  const reviewWork = selectedReview
+    ? MY_WORKS.find((w) => w.id === selectedReview.workId)
+    : null;
+
+  const openClientFromReview = (client) => {
+    if (!client) return;
+    setSelectedReview(null);
+    setSelectedClient(client);
+  };
+
+  const openWorkFromReview = (work) => {
+    if (!work) return;
+    setSelectedReview(null);
+    setSelectedWork(work);
+  };
+
+  if (showEarnings) {
+    return (
+      <EarningsScreen
+        t={t}
+        week={WEEK}
+        works={MY_WORKS}
+        categories={categories}
+        onBack={() => setShowEarnings(false)}
+        onSelectWork={(w) => {
+          setShowEarnings(false);
+          setSelectedWork(w);
+        }}
+      />
+    );
+  }
+
+  if (showPaymentHistory) {
+    return <PaymentHistoryScreen onBack={() => setShowPaymentHistory(false)} />;
+  }
+
+  if (showWithdraw) {
+    return (
+      <WithdrawScreen
+        t={t}
+        balance={BALANCE}
+        onBack={() => setShowWithdraw(false)}
+      />
+    );
+  }
+
+  if (activeTab === 'profile') {
+    return (
+      <UstaProfileScreen
+        onTabChange={setActiveTab}
+        onLogout={onLogout}
+        onOpenEarnings={() => setShowEarnings(true)}
+      />
+    );
+  }
 
   if (selectedClient) {
     const clientWorks = MY_WORKS.filter((w) => w.client.id === selectedClient.id);
@@ -511,6 +640,23 @@ export default function UstaMainScreen({ onLogout }) {
         t={t}
         onBack={() => setSelectedWork(null)}
         onOpenClient={(client) => setSelectedClient(client)}
+      />
+    );
+  }
+
+  if (selectedCategory) {
+    const categoryWorks = MY_WORKS.filter((w) => w.category === selectedCategory.name);
+    return (
+      <CategoryDetailScreen
+        category={selectedCategory}
+        works={categoryWorks}
+        t={t}
+        onBack={() => setSelectedCategoryId(null)}
+        onSelectWork={(w) => {
+          setSelectedCategoryId(null);
+          setSelectedWork(w);
+        }}
+        onUpdate={(updates) => updateCategory(selectedCategory.id, updates)}
       />
     );
   }
@@ -540,6 +686,14 @@ export default function UstaMainScreen({ onLogout }) {
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 100 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={handleRefresh}
+            tintColor={t.orange}
+            colors={[t.orange]}
+          />
+        }
       >
         {/* ── Header ── */}
         <View style={s.header}>
@@ -725,17 +879,25 @@ export default function UstaMainScreen({ onLogout }) {
               Hisobingizdagi mablag'
             </Text>
             <Text style={s.balanceAmt}>
-              1 840 000 <Text style={s.balanceCur}>so'm</Text>
+              {fmt(BALANCE)} <Text style={s.balanceCur}>so'm</Text>
             </Text>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
-              <TouchableOpacity style={s.btnWhite} activeOpacity={0.8}>
+              <TouchableOpacity
+                style={s.btnWhite}
+                activeOpacity={0.8}
+                onPress={() => setShowWithdraw(true)}
+              >
                 <Text
                   style={{ color: t.orangeD, fontWeight: '700', fontSize: 13 }}
                 >
                   Pul yechish
                 </Text>
               </TouchableOpacity>
-              <TouchableOpacity style={s.btnOutline} activeOpacity={0.8}>
+              <TouchableOpacity
+                style={s.btnOutline}
+                activeOpacity={0.8}
+                onPress={() => setShowPaymentHistory(true)}
+              >
                 <Text
                   style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}
                 >
@@ -836,7 +998,11 @@ export default function UstaMainScreen({ onLogout }) {
 
         {/* ── Weekly chart ── */}
         <View style={{ paddingHorizontal: 20, marginTop: 20 }}>
-          <View style={[s.miniCard, { backgroundColor: t.card, borderColor: t.border }]}>
+          <TouchableOpacity
+            style={[s.miniCard, { backgroundColor: t.card, borderColor: t.border }]}
+            activeOpacity={0.8}
+            onPress={() => setShowEarnings(true)}
+          >
             <View
               style={{
                 flexDirection: 'row',
@@ -885,56 +1051,119 @@ export default function UstaMainScreen({ onLogout }) {
                 </View>
               ))}
             </View>
-          </View>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: 4,
+                marginTop: 14,
+              }}
+            >
+              <Text style={{ fontSize: 11, fontWeight: '700', color: t.orange }}>
+                Barcha daromadlarni ko'rish
+              </Text>
+              <Ionicons name="chevron-forward" size={13} color={t.orange} />
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* ── Mening kategoriyalarim ── */}
-        <MyCategoriesSection t={t} />
+        <MyCategoriesSection
+          t={t}
+          categories={categories}
+          onSelect={(c) => setSelectedCategoryId(c.id)}
+        />
 
         {/* ── Bajarilgan ishlar ── */}
         <RecentWorksSection t={t} onSelect={setSelectedWork} />
 
         {/* ── So'nggi sharhlar ── */}
         <View style={{ paddingHorizontal: 20, marginTop: 26 }}>
-          <SectionHeader theme={t} title="So'nggi sharhlar" action="Barchasi" />
+          <SectionHeader theme={t} title="So'nggi sharhlar" />
           <View style={{ gap: 10 }}>
-            {MY_REVIEWS.map((r) => (
-              <View
-                key={r.id}
-                style={[s.reviewCard, { backgroundColor: t.card, borderColor: t.border }]}
-              >
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                  <Avatar letter={r.name.charAt(0)} bgColor={t.blue} size={34} />
-                  <View style={{ flex: 1 }}>
-                    <Text style={{ fontSize: 13, fontWeight: '700', color: t.text }}>
-                      {r.name}
-                    </Text>
-                    <Text style={{ fontSize: 10.5, color: t.muted, marginTop: 1 }}>
-                      {r.time}
-                    </Text>
-                  </View>
-                  <View style={{ flexDirection: 'row', gap: 1 }}>
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Ionicons
-                        key={i}
-                        name="star"
-                        size={12}
-                        color={i < r.rating ? t.gold : t.border}
-                      />
-                    ))}
-                  </View>
-                </View>
-                <Text
-                  style={{ fontSize: 12.5, color: t.muted, marginTop: 9, lineHeight: 18 }}
-                  numberOfLines={3}
+            {MY_REVIEWS.map((r, i) => {
+              const avatarColor = [t.blue, t.violet, t.green][i % 3];
+              const linkedWork = MY_WORKS.find((w) => w.id === r.workId);
+              return (
+                <TouchableOpacity
+                  key={r.id}
+                  style={[s.reviewCard, { backgroundColor: t.card, borderColor: t.border }]}
+                  activeOpacity={0.75}
+                  onPress={() => setSelectedReview(r)}
                 >
-                  {r.text}
-                </Text>
-              </View>
-            ))}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    <Avatar letter={r.name.charAt(0)} bgColor={avatarColor} size={34} />
+                    <View style={{ flex: 1 }}>
+                      <Text style={{ fontSize: 13, fontWeight: '700', color: t.text }}>
+                        {r.name}
+                      </Text>
+                      <Text style={{ fontSize: 10.5, color: t.muted, marginTop: 1 }}>
+                        {r.time}
+                      </Text>
+                    </View>
+                    <View style={{ flexDirection: 'row', gap: 1 }}>
+                      {Array.from({ length: 5 }).map((_, j) => (
+                        <Ionicons
+                          key={j}
+                          name="star"
+                          size={12}
+                          color={j < r.rating ? t.gold : t.border}
+                        />
+                      ))}
+                    </View>
+                  </View>
+                  <Text
+                    style={{ fontSize: 12.5, color: t.muted, marginTop: 9, lineHeight: 18 }}
+                    numberOfLines={3}
+                  >
+                    {r.text}
+                  </Text>
+                  {linkedWork && (
+                    <View
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        marginTop: 10,
+                        paddingTop: 10,
+                        borderTopWidth: 1,
+                        borderTopColor: t.border,
+                      }}
+                    >
+                      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flex: 1 }}>
+                        <MaterialCommunityIcons
+                          name={linkedWork.icon}
+                          size={13}
+                          color={linkedWork.color}
+                        />
+                        <Text
+                          style={{ fontSize: 11, fontWeight: '600', color: t.muted, flex: 1 }}
+                          numberOfLines={1}
+                        >
+                          {linkedWork.title}
+                        </Text>
+                      </View>
+                      <Ionicons name="chevron-forward" size={15} color={t.faint} />
+                    </View>
+                  )}
+                </TouchableOpacity>
+              );
+            })}
           </View>
         </View>
       </ScrollView>
+
+      <ReviewDetailSheet
+        visible={!!selectedReview}
+        review={selectedReview}
+        work={reviewWork}
+        client={reviewWork?.client}
+        onClose={() => setSelectedReview(null)}
+        onOpenClient={openClientFromReview}
+        onOpenWork={openWorkFromReview}
+        t={t}
+      />
 
       {/* ── Bottom nav ── */}
       <BottomNav
