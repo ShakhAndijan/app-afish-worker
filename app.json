@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "afish.uz",
+    "slug": "mobile-app-afish",
+    "scheme": "mobile-app-afish",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/afish-logo-icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "package": "uz.afish.zakazchik",
+      "softwareKeyboardLayoutMode": "resize",
+      "adaptiveIcon": {
+        "backgroundColor": "#FFFFFF",
+        "foregroundImage": "./assets/afish-logo-icon.png"
+      },
+      "permissions": [
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-web-browser",
+      "expo-location",
+      "expo-secure-store",
+      "expo-image"
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "d45371fb-bf89-4d60-914e-6ca325c91aa3"
+      }
+    },
+    "owner": "shakhandijan"
+  }
+}
