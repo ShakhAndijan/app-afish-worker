@@ -17,8 +17,10 @@ import Feather from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
+import { useProfileCompletion } from '../hooks/useProfileCompletion';
 import { getAvatarUploadUrl, confirmAvatar, deleteAvatar } from '../api/user';
 import { uploadImageToPresignedUrl } from '../api/auth';
+import ProfileCompletionCard from '../components/ProfileCompletionCard';
 import ZakazchiHelpScreen from './ZakazchiHelpScreen';
 import ZakazchiNotifScreen from './ZakazchiNotifScreen';
 import ZakazchiOrdersScreen from './ZakazchiOrdersScreen';
@@ -156,6 +158,7 @@ function SettingsRow({ icon, label, value, danger, color, onPress, t }) {
 export default function UstaProfileScreen({ onTabChange, onLogout, onOpenEarnings }) {
   const { theme: t, toggleTheme } = useTheme();
   const { user, refreshUser } = useUser();
+  const { isComplete: profileComplete } = useProfileCompletion(user);
   const [screen, setScreen] = useState('profile');
   const [lang, setLang] = useState('uz');
   const [showTil, setShowTil] = useState(false);
@@ -462,6 +465,17 @@ export default function UstaProfileScreen({ onTabChange, onLogout, onOpenEarning
             ))}
           </View>
         </View>
+
+        {/* ── Profil to'ldirilishi ── */}
+        {!profileComplete && (
+          <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>
+            <ProfileCompletionCard
+              user={user}
+              theme={t}
+              onPressComplete={() => setScreen('editProfile')}
+            />
+          </View>
+        )}
 
         {/* ── Hamyon + sodiqlik darajasi ── */}
         <View style={{ paddingHorizontal: 20, paddingTop: 16 }}>

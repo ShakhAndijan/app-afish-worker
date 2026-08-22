@@ -23,6 +23,8 @@ export default function CodeStep({
   devCode,
   onResend,
   resendLoading,
+  error,
+  confirmLoading,
 }) {
   const [code, setCode] = useState('');
   const [timer, setTimer] = useState(60);
@@ -65,6 +67,8 @@ export default function CodeStep({
         </Text>
       )}
 
+      {!!error && <Text style={styles.errorTxt}>{error}</Text>}
+
       <Text style={styles.timerText}>
         {timer > 0 ? (
           <>Qayta yuborish <Text style={styles.timerCount}>00:{String(timer).padStart(2, '0')}</Text></>
@@ -76,8 +80,8 @@ export default function CodeStep({
       </Text>
 
       <PrimaryBtn
-        label="Tasdiqlash"
-        disabled={code.length < 6}
+        label={confirmLoading ? 'Tekshirilmoqda...' : 'Tasdiqlash'}
+        disabled={code.length < 6 || confirmLoading}
         onPress={() => onConfirm?.(code)}
       />
     </View>
@@ -128,6 +132,13 @@ const styles = StyleSheet.create({
   devCodeVal: {
     color: COLORS.orange,
     fontWeight: '700',
+  },
+  errorTxt: {
+    color: COLORS.red ?? '#e0473a',
+    fontSize: 13,
+    textAlign: 'center',
+    marginTop: -8,
+    fontWeight: '600',
   },
   timerCount: {
     color: COLORS.white,

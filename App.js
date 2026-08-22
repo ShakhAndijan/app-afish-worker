@@ -1230,10 +1230,7 @@ function SectionHead({ title, link }) {
 
 export default function App() {
   const [searchText, setSearchText] = useState('');
-  // TEMP-BYPASS: backend ishlamayotgani uchun to'g'ridan-to'g'ri UstaMainScreen
-  // ochilyapti. Login flow'ni qaytarish uchun bu qatorni useState('home') ga
-  // qaytarish kifoya.
-  const [screen, setScreen] = useState('usta-dashboard');
+  const [screen, setScreen] = useState('home');
   const [selectedUsta, setSelectedUsta] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [refreshing, setRefreshing] = useState(false);

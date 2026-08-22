@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
+  Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -14,9 +15,11 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '../context/ThemeContext';
 import { useUser } from '../context/UserContext';
+import { useProfileCompletion } from '../hooks/useProfileCompletion';
 import Avatar from '../components/Avatar';
 import BottomNav from '../components/BottomNav';
 import SectionHeader from '../components/SectionHeader';
+import ProfileCompletionCard from '../components/ProfileCompletionCard';
 import WorkDetailScreen from './WorkDetailScreen';
 import ClientProfileScreen from './ClientProfileScreen';
 import UstaProfileScreen from './UstaProfileScreen';
@@ -356,13 +359,6 @@ const MY_REVIEWS = [
   },
 ];
 
-const PROFILE_CHECKLIST = [
-  { key: 'photo', label: 'Profil rasmi', icon: 'account-circle-outline' },
-  { key: 'bio', label: "O'zingiz haqingizda", icon: 'text-box-outline' },
-  { key: 'categories', label: 'Kamida 1 kategoriya', icon: 'briefcase-outline' },
-  { key: 'certificates', label: 'Sertifikat', icon: 'certificate-outline' },
-];
-
 const CAT_CARD_W = 132;
 const CAT_GAP = 10;
 const CAT_SLOT = CAT_CARD_W + CAT_GAP;
@@ -531,6 +527,7 @@ const USTA_TABS = [
 export default function UstaMainScreen({ onLogout }) {
   const { theme: t } = useTheme();
   const { user, refreshUser } = useUser();
+  const { isComplete: profileComplete } = useProfileCompletion(user);
   const [online, setOnline] = useState(true);
   const [activeTab, setActiveTab] = useState('home');
   const [selectedWork, setSelectedWork] = useState(null);
@@ -547,6 +544,26 @@ export default function UstaMainScreen({ onLogout }) {
     setRefreshing(true);
     await refreshUser();
     setRefreshing(false);
+  };
+
+  // Profil to'liq bo'lmagan hisob "onlayn" holatida ochilib qolmasin.
+  useEffect(() => {
+    if (user && !profileComplete) setOnline(false);
+  }, [user, profileComplete]);
+
+  const handleToggleOnline = () => {
+    if (!online && !profileComplete) {
+      Alert.alert(
+        "Profilni to'ldiring",
+        "Buyurtma qabul qilish uchun avval ma'lumotlaringizni to'ldirishingiz kerak.",
+        [
+          { text: 'Bekor qilish', style: 'cancel' },
+          { text: "To'ldirish", onPress: () => setActiveTab('profile') },
+        ]
+      );
+      return;
+    }
+    setOnline((o) => !o);
   };
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) || null;
@@ -667,15 +684,6 @@ export default function UstaMainScreen({ onLogout }) {
     .charAt(0)
     .toUpperCase();
 
-  const checklistDone = {
-    photo: !!user?.profile_photo,
-    bio: !!(user?.bio && user.bio.trim()),
-    categories: (user?.categories?.length ?? 0) > 0,
-    certificates: (user?.certificates?.length ?? 0) > 0,
-  };
-  const doneCount = Object.values(checklistDone).filter(Boolean).length;
-  const profilePercent = Math.round((doneCount / PROFILE_CHECKLIST.length) * 100);
-
   return (
     <SafeAreaView
       style={{ flex: 1, backgroundColor: t.bg }}
@@ -765,7 +773,7 @@ export default function UstaMainScreen({ onLogout }) {
               </Text>
             </View>
             <TouchableOpacity
-              onPress={() => setOnline((o) => !o)}
+              onPress={handleToggleOnline}
               style={[
                 s.track,
                 { backgroundColor: online ? t.green : '#33425a' },
@@ -779,81 +787,11 @@ export default function UstaMainScreen({ onLogout }) {
 
         {/* ── Profil to'ldirilishi ── */}
         <View style={{ paddingHorizontal: 20, marginTop: 18 }}>
-          <View style={[s.profCard, { backgroundColor: t.card, borderColor: t.border }]}>
-            {profilePercent === 100 ? (
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <MaterialCommunityIcons name="check-decagram" size={22} color={t.green} />
-                <Text style={{ flex: 1, fontSize: 13, fontWeight: '700', color: t.text }}>
-                  Profilingiz to'liq to'ldirilgan
-                </Text>
-              </View>
-            ) : (
-              <>
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    marginBottom: 8,
-                  }}
-                >
-                  <Text style={{ fontSize: 14, fontWeight: '700', color: t.text }}>
-                    Profilingiz {profilePercent}% to'ldirilgan
-                  </Text>
-                  <View style={[s.profBadge, { backgroundColor: t.orange }]}>
-                    <Text style={s.profBadgeTxt}>{profilePercent}%</Text>
-                  </View>
-                </View>
-                <View style={[s.profTrack, { backgroundColor: t.rowIconBg }]}>
-                  <View
-                    style={[
-                      s.profFill,
-                      { width: `${profilePercent}%`, backgroundColor: t.orange },
-                    ]}
-                  />
-                </View>
-                <Text style={{ fontSize: 11.5, color: t.muted, marginTop: 10, lineHeight: 17 }}>
-                  Bu ma'lumotlar — mijozlarga ko'rinadigan ommaviy profilingiz. Alohida
-                  e'lon joylashning hojati yo'q: mijozlar aynan shu profil orqali sizni
-                  topadi va bog'lanadi.
-                </Text>
-                <View style={{ marginTop: 12, gap: 8 }}>
-                  {PROFILE_CHECKLIST.map((item) => {
-                    const done = checklistDone[item.key];
-                    return (
-                      <View
-                        key={item.key}
-                        style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}
-                      >
-                        <Ionicons
-                          name={done ? 'checkmark-circle' : 'ellipse-outline'}
-                          size={16}
-                          color={done ? t.green : t.faint}
-                        />
-                        <Text
-                          style={{
-                            fontSize: 12.5,
-                            color: done ? t.text : t.muted,
-                            fontWeight: done ? '600' : '400',
-                          }}
-                        >
-                          {item.label}
-                        </Text>
-                      </View>
-                    );
-                  })}
-                </View>
-                <TouchableOpacity
-                  style={[s.profBtn, { backgroundColor: t.orange }]}
-                  activeOpacity={0.85}
-                  onPress={() => setActiveTab('profile')}
-                >
-                  <Text style={s.profBtnTxt}>Profilni to'ldirish</Text>
-                  <Ionicons name="arrow-forward" size={15} color="#fff" />
-                </TouchableOpacity>
-              </>
-            )}
-          </View>
+          <ProfileCompletionCard
+            user={user}
+            theme={t}
+            onPressComplete={() => setActiveTab('profile')}
+          />
         </View>
 
         {/* ── Moliya ── */}
@@ -1274,37 +1212,6 @@ const s = StyleSheet.create({
     padding: 15,
     borderWidth: 1,
   },
-
-  profCard: {
-    borderRadius: 18,
-    padding: 16,
-    borderWidth: 1,
-  },
-  profBadge: {
-    paddingHorizontal: 9,
-    paddingVertical: 3,
-    borderRadius: 999,
-  },
-  profBadgeTxt: { fontSize: 11.5, fontWeight: '800', color: '#fff' },
-  profTrack: {
-    height: 7,
-    borderRadius: 4,
-    overflow: 'hidden',
-  },
-  profFill: {
-    height: '100%',
-    borderRadius: 4,
-  },
-  profBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 7,
-    height: 44,
-    borderRadius: 13,
-    marginTop: 14,
-  },
-  profBtnTxt: { color: '#fff', fontWeight: '700', fontSize: 13 },
 
   reviewCard: {
     borderRadius: 16,

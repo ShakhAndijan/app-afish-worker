@@ -45,8 +45,6 @@ const formatPhoneDisplay = (raw = '') => {
   return `+998 ${s}`.trim();
 };
 
-// Android'dagi Image (Fresco/OkHttp) kodlanmagan "+" belgisini URL'da
-// noto'g'ri talqin qilib, rasmni yuklolmasligi mumkin — shu sababli xavfsiz kodlaymiz.
 const encodeImageUri = (uri) => (uri ? uri.replace(/\+/g, '%2B') : uri);
 
 function Avatar({ letter = 'J', size = 80, bgColor, uri }) {

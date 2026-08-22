@@ -164,6 +164,51 @@ export async function requestLoginOtp(phone) {
   return data.response_data; // { sent, dev_code }
 }
 
+export async function requestWorkerLoginOtp(phone) {
+  const res = await fetch(ENDPOINTS.WORKER_LOGIN_REQUEST_OTP, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || 'Kod yuborishda xatolik yuz berdi');
+  }
+  const data = await res.json();
+  return data.response_data; // { sent, dev_code }
+}
+
+export async function verifyWorkerLoginOtp(phone, code) {
+  const res = await fetch(ENDPOINTS.WORKER_LOGIN_VERIFY_OTP, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone, code }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    const e = new Error(err.message || 'Tasdiqlashda xatolik yuz berdi');
+    e.status = res.status;
+    e.code = err.error_code || err.code;
+    throw e;
+  }
+  const data = await res.json();
+  return data.response_data; // { access_token, refresh_token, ... }
+}
+
+// TODO(backend): "telefon ro'yxatdan o'tmagan" holati uchun aniq shartnoma
+// hali kelishilmagan. Backend tayyor bo'lgach shu funksiyani moslashtirish
+// kifoya — qolgan kod shu bitta joyga tayanadi.
+export function isNotRegisteredError(err) {
+  if (!err) return false;
+  if (err.status === 404) return true;
+  const code = String(err.code || '').toLowerCase();
+  if (['not_registered', 'user_not_found', 'worker_not_found'].includes(code)) {
+    return true;
+  }
+  const msg = String(err.message || '').toLowerCase();
+  return msg.includes("ro'yxatdan o'tmagan") || msg.includes('topilmadi');
+}
+
 export async function requestResetPasswordOtp(phone) {
   const res = await fetch(ENDPOINTS.RESET_PASSWORD_REQUEST_OTP, {
     method: 'POST',

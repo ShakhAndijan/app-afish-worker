@@ -10,6 +10,8 @@ export const ENDPOINTS = {
   WORKER_REGISTER_VERIFY_OTP: `${API_BASE_URL}/api/v1/auth/worker/register/verify-otp`,
   CUSTOMER_LOGIN: `${API_BASE_URL}/api/v1/auth/customer/login`,
   WORKER_LOGIN: `${API_BASE_URL}/api/v1/auth/worker/login`,
+  WORKER_LOGIN_REQUEST_OTP: `${API_BASE_URL}/api/v1/auth/worker/login/request-otp`,
+  WORKER_LOGIN_VERIFY_OTP: `${API_BASE_URL}/api/v1/auth/worker/login/verify-otp`,
   LOGIN_REQUEST_OTP: `${API_BASE_URL}/api/v1/auth/customer/login/request-otp`,
   AUTH_ME: `${API_BASE_URL}/api/v1/auth/me`,
   AUTH_SET_PASSWORD: `${API_BASE_URL}/api/v1/auth/set-password`,
