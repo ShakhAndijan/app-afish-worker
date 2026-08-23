@@ -18,6 +18,7 @@ const formatPhone = (raw = '') => {
 
 export default function CodeStep({
   phone,
+  email,
   onBack,
   onConfirm,
   devCode,
@@ -54,8 +55,17 @@ export default function CodeStep({
         />
         <Text style={styles.title}>Tasdiqlash kodi</Text>
         <Text style={styles.subtitle}>
-          <Text style={styles.phone}>+998 {formatPhone(phone)}</Text>
-          {' '}raqamiga yuborilgan 6 xonali kodni kiriting.
+          {email ? (
+            <>
+              <Text style={styles.phone}>{email}</Text>
+              {' '}manziliga yuborilgan 6 xonali kodni kiriting.
+            </>
+          ) : (
+            <>
+              <Text style={styles.phone}>+998 {formatPhone(phone)}</Text>
+              {' '}raqamiga yuborilgan 6 xonali kodni kiriting.
+            </>
+          )}
         </Text>
       </View>
 

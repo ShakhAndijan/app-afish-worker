@@ -9,13 +9,19 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
-import PhoneInput from '../../components/login/PhoneInput';
+import IdentifierInput from '../../components/login/IdentifierInput';
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export default function PhoneOtpStep({
+  identifierMode,
+  onChangeIdentifierMode,
   phone,
-  onChange,
+  onChangePhone,
+  email,
+  onChangeEmail,
   onContinue,
   loading,
   error,
@@ -23,11 +29,16 @@ export default function PhoneOtpStep({
   onBack,
   onGoogle,
   googleLoading,
-  onEmail,
+  onTelegram,
+  telegramLoading,
+  showTelegram,
 }) {
   const { theme, toggleTheme } = useTheme();
   const isDark = theme.isDark !== false;
-  const isReady = phone.length === 9 && !loading;
+  const isReady =
+    !loading &&
+    ((identifierMode === 'phone' && phone.length === 9) ||
+      (identifierMode === 'email' && EMAIL_REGEX.test(email.trim())));
 
   return (
     <KeyboardAvoidingView
@@ -80,14 +91,23 @@ export default function PhoneOtpStep({
             />
             <Text style={[s.h1, { color: theme.text }]}>Ishni boshlaymizmi?</Text>
             <Text style={[s.sub, { color: theme.muted }]}>
-              Telefon raqamingizni kiriting — tasdiqlash kodini yuboramiz.
+              Telefon raqamingiz yoki emailingizni kiriting — tasdiqlash kodini yuboramiz.
             </Text>
           </View>
 
-          {/* ── Phone field ── */}
+          {/* ── Identifier field (telefon yoki email) ── */}
           <View style={s.fieldWrap}>
-            <Text style={[s.fieldLabel, { color: theme.muted }]}>Telefon raqami</Text>
-            <PhoneInput value={phone} onChangeText={onChange} theme={theme} autoFocus />
+            <Text style={[s.fieldLabel, { color: theme.muted }]}>Telefon raqami yoki email</Text>
+            <IdentifierInput
+              mode={identifierMode}
+              onChangeMode={onChangeIdentifierMode}
+              phone={phone}
+              onChangePhone={onChangePhone}
+              email={email}
+              onChangeEmail={onChangeEmail}
+              theme={theme}
+              autoFocus
+            />
           </View>
 
           {/* ── Error ── */}
@@ -126,14 +146,19 @@ export default function PhoneOtpStep({
               <Text style={[s.socTxt, { color: isDark ? theme.text : '#1f2937' }]}>Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[s.socBtn, { borderColor: theme.border, backgroundColor: theme.card }]}
-              onPress={onEmail}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="mail-outline" size={20} color={theme.text} />
-              <Text style={[s.socTxt, { color: theme.text }]}>Email</Text>
-            </TouchableOpacity>
+            {showTelegram && (
+              <TouchableOpacity
+                style={[s.socBtn, { borderColor: theme.border, backgroundColor: theme.card }]}
+                onPress={telegramLoading ? undefined : onTelegram}
+                activeOpacity={0.85}
+              >
+                {telegramLoading
+                  ? <ActivityIndicator size="small" color="#29a9eb" />
+                  : <FontAwesome5 name="telegram" brand size={20} color="#29a9eb" />
+                }
+                <Text style={[s.socTxt, { color: theme.text }]}>Telegram</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* ── Footer ── */}

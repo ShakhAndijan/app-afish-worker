@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Image,
 } from 'react-native';
-import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useTheme } from '../../context/ThemeContext';
 import PhoneInput from '../../components/login/PhoneInput';
 import PasswordInput from '../../components/login/PasswordInput';
@@ -36,7 +36,9 @@ export default function PhoneStep({
   onForgot,
   onGoogle,
   googleLoading,
-  onEmail,
+  onTelegram,
+  telegramLoading,
+  showTelegram,
   onRegister,
   onBack,
   actorType = 'customer',
@@ -190,14 +192,19 @@ export default function PhoneStep({
               <Text style={[s.socTxt, { color: isDark ? theme.text : '#1f2937' }]}>Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity
-              style={[s.socBtn, { borderColor: theme.border, backgroundColor: theme.card }]}
-              onPress={onEmail}
-              activeOpacity={0.85}
-            >
-              <Ionicons name="mail-outline" size={20} color={theme.text} />
-              <Text style={[s.socTxt, { color: theme.text }]}>Email</Text>
-            </TouchableOpacity>
+            {showTelegram && (
+              <TouchableOpacity
+                style={[s.socBtn, { borderColor: theme.border, backgroundColor: theme.card }]}
+                onPress={telegramLoading ? undefined : onTelegram}
+                activeOpacity={0.85}
+              >
+                {telegramLoading
+                  ? <ActivityIndicator size="small" color="#29a9eb" />
+                  : <FontAwesome5 name="telegram" brand size={20} color="#29a9eb" />
+                }
+                <Text style={[s.socTxt, { color: theme.text }]}>Telegram</Text>
+              </TouchableOpacity>
+            )}
           </View>
 
           {/* ── Footer ── */}

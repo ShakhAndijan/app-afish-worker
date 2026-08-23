@@ -45,48 +45,6 @@ export async function verifyRegisterOtp(payload) {
   return data.response_data;
 }
 
-export async function requestWorkerRegisterOtp(phone) {
-  const res = await fetch(ENDPOINTS.WORKER_REGISTER_REQUEST_OTP, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'OTP yuborishda xatolik yuz berdi');
-  }
-  const data = await res.json();
-  return data.response_data;
-}
-
-export async function getWorkerRegisterUploadUrl(phone, code, contentType) {
-  const res = await fetch(ENDPOINTS.WORKER_REGISTER_UPLOAD_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone, code, content_type: contentType }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || 'Yuklash URL olishda xatolik');
-  }
-  const data = await res.json();
-  return data.response_data; // { upload_url, temp_key, expires_in }
-}
-
-export async function verifyWorkerRegisterOtp(payload) {
-  const res = await fetch(ENDPOINTS.WORKER_REGISTER_VERIFY_OTP, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err.message || "Ro'yxatdan o'tishni yakunlashda xatolik");
-  }
-  const data = await res.json();
-  return data.response_data;
-}
-
 export async function uploadImageToPresignedUrl(
   uploadUrl,
   imageUri,
@@ -164,49 +122,94 @@ export async function requestLoginOtp(phone) {
   return data.response_data; // { sent, dev_code }
 }
 
-export async function requestWorkerLoginOtp(phone) {
-  const res = await fetch(ENDPOINTS.WORKER_LOGIN_REQUEST_OTP, {
+// Yagona kirish/ro'yxatdan o'tish oqimi: start -> verify -> complete
+// (yoki verify "other_actor" qaytarsa -> claim). Har bir actor_type
+// (worker/customer) o'zining URL nomfazosiga ega, lekin so'rov shakli bir xil.
+function authEndpoint(actorType, name) {
+  const prefix = actorType === 'customer' ? 'CUSTOMER_AUTH_' : 'WORKER_AUTH_';
+  return ENDPOINTS[`${prefix}${name}`];
+}
+
+function logAuth(step, phase, payload) {
+  console.log(`[auth:${step}] ${phase}`, payload);
+}
+
+export async function authStart(identifier, channel = 'sms', actorType = 'worker') {
+  const url = authEndpoint(actorType, 'START');
+  logAuth('start', '-> so\'rov', { url, identifier, channel, actorType });
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone }),
+    body: JSON.stringify({ identifier, channel }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
+    logAuth('start', '<- xatolik', { status: res.status, err });
     throw new Error(err.message || 'Kod yuborishda xatolik yuz berdi');
   }
   const data = await res.json();
-  return data.response_data; // { sent, dev_code }
+  logAuth('start', '<- javob', data.response_data);
+  return data.response_data;
 }
 
-export async function verifyWorkerLoginOtp(phone, code) {
-  const res = await fetch(ENDPOINTS.WORKER_LOGIN_VERIFY_OTP, {
+export async function authVerify(identifier, code, actorType = 'worker') {
+  const url = authEndpoint(actorType, 'VERIFY');
+  logAuth('verify', '-> so\'rov', { url, identifier, code, actorType });
+  const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ phone, code }),
+    body: JSON.stringify({ identifier, code }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
-    const e = new Error(err.message || 'Tasdiqlashda xatolik yuz berdi');
-    e.status = res.status;
-    e.code = err.error_code || err.code;
-    throw e;
+    logAuth('verify', '<- xatolik', { status: res.status, err });
+    throw new Error(err.message || 'Tasdiqlashda xatolik yuz berdi');
   }
   const data = await res.json();
-  return data.response_data; // { access_token, refresh_token, ... }
+  logAuth('verify', '<- javob', data.response_data); // { status, access_token?, refresh_token?, ticket?, other_actor? }
+  return data.response_data;
 }
 
-// TODO(backend): "telefon ro'yxatdan o'tmagan" holati uchun aniq shartnoma
-// hali kelishilmagan. Backend tayyor bo'lgach shu funksiyani moslashtirish
-// kifoya — qolgan kod shu bitta joyga tayanadi.
-export function isNotRegisteredError(err) {
-  if (!err) return false;
-  if (err.status === 404) return true;
-  const code = String(err.code || '').toLowerCase();
-  if (['not_registered', 'user_not_found', 'worker_not_found'].includes(code)) {
-    return true;
+export async function authComplete(ticket, firstName, lastName, actorType = 'worker') {
+  const url = authEndpoint(actorType, 'COMPLETE');
+  logAuth('complete', '-> so\'rov', { url, ticket, firstName, lastName, actorType });
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      ticket,
+      first_name: firstName,
+      last_name: lastName,
+    }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    logAuth('complete', '<- xatolik', { status: res.status, err });
+    throw new Error(err.message || "Ro'yxatdan o'tishni yakunlashda xatolik");
   }
-  const msg = String(err.message || '').toLowerCase();
-  return msg.includes("ro'yxatdan o'tmagan") || msg.includes('topilmadi');
+  const data = await res.json();
+  logAuth('complete', '<- javob', data.response_data); // { access_token, refresh_token, token_type, already_registered }
+  return data.response_data;
+}
+
+// actorType shu yerda "qaysi tomonga kirilyapti"ni bildiradi — verify
+// "other_actor" bilan qaytargan actor_type shu yerga beriladi.
+export async function authClaim(ticket, actorType) {
+  const url = authEndpoint(actorType, 'CLAIM');
+  logAuth('claim', '-> so\'rov', { url, ticket, actorType });
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ ticket }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    logAuth('claim', '<- xatolik', { status: res.status, err });
+    throw new Error(err.message || 'Hisobga kirishda xatolik yuz berdi');
+  }
+  const data = await res.json();
+  logAuth('claim', '<- javob', data.response_data); // { access_token, refresh_token, token_type, already_registered }
+  return data.response_data;
 }
 
 export async function requestResetPasswordOtp(phone) {
@@ -240,6 +243,37 @@ export async function verifyResetPasswordOtp(phone, code, newPassword) {
   }
   const data = await res.json();
   return data.response_data;
+}
+
+export async function getTelegramConfig() {
+  const res = await fetch(ENDPOINTS.TELEGRAM_CONFIG);
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || "Telegram sozlamalarini olishda xatolik");
+  }
+  const data = await res.json();
+  console.log('[auth:telegram] config', data.response_data);
+  return data.response_data; // { enabled, bot_id, bot_username }
+}
+
+// `data` — Telegram Login Widget'ning xom callback obyekti (id, first_name,
+// username, photo_url, auth_date, hash — hammasi, chunki imzo shu maydonlarning
+// hammasini qamrab oladi).
+export async function telegramVerify(actorType, data) {
+  console.log('[auth:telegram] verify -> so\'rov', { actorType, data });
+  const res = await fetch(ENDPOINTS.TELEGRAM_VERIFY, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ actor_type: actorType, data }),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    console.log('[auth:telegram] verify <- xatolik', { status: res.status, err });
+    throw new Error(err.message || 'Telegram orqali kirishda xatolik');
+  }
+  const resp = await res.json();
+  console.log('[auth:telegram] verify <- javob', resp.response_data);
+  return resp.response_data; // { access_token, refresh_token, token_type, actor_type, actor_id, already_registered }
 }
 
 export async function googleLogin(actorType = 'customer') {
