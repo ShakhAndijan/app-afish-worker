@@ -1244,14 +1244,19 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      const token = await getToken();
-      if (token) {
-        const actorType = await getActorType();
-        setScreen(
-          actorType === 'worker' ? 'usta-dashboard' : 'zakazchi-dashboard'
-        );
+      try {
+        const token = await getToken();
+        if (token) {
+          const actorType = await getActorType();
+          setScreen(
+            actorType === 'worker' ? 'usta-dashboard' : 'zakazchi-dashboard'
+          );
+        }
+      } catch (e) {
+        console.log('[App] auth tekshirishda xatolik', e.message);
+      } finally {
+        setAuthChecked(true);
       }
-      setAuthChecked(true);
     })();
   }, []);
 
