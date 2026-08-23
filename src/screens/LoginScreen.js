@@ -8,7 +8,6 @@ import {
   loginWorker,
   authStart,
   authVerify,
-  authClaim,
   getTelegramConfig,
   telegramVerify,
   requestResetPasswordOtp,
@@ -131,21 +130,6 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
     }
   };
 
-  const handleClaimOtherActor = async (claimTicket, otherActor) => {
-    console.log('[LoginScreen] 4-jarayon: boshqa hisobga claim qilinmoqda', { otherActor });
-    try {
-      const data = await authClaim(claimTicket, otherActor);
-      if (data?.access_token) await saveToken(data.access_token);
-      if (data?.refresh_token) await saveRefreshToken(data.refresh_token);
-      await saveActorType(otherActor);
-      console.log('[LoginScreen] claim muvaffaqiyatli -> kirildi', { actorType: otherActor });
-      (onLoginSuccess ?? onBack)(otherActor);
-    } catch (e) {
-      console.log('[LoginScreen] claim qilishda xatolik', e.message);
-      Alert.alert('Xato', e.message || 'Hisobga kirishda xatolik yuz berdi');
-    }
-  };
-
   const handleConfirmOtp = async (code) => {
     console.log('[LoginScreen] 2-jarayon: kod tasdiqlanmoqda', { identifier: identifier(), code, actorType });
     try {
@@ -168,27 +152,9 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
         return;
       }
       if (data?.status === 'other_actor') {
-        const otherActor = data.other_actor;
-        const label = otherActor === 'customer' ? 'mijoz' : 'usta';
-        console.log('[LoginScreen] raqam boshqa actorda topildi', { otherActor });
-        Alert.alert(
-          'Hisob topildi',
-          `Bu raqam ${label} sifatida ro'yxatdan o'tgan. Shu hisobga kirasizmi, yoki usta sifatida yangi hisob yaratasizmi?`,
-          [
-            { text: 'Bekor qilish', style: 'cancel' },
-            {
-              text: 'Yangi (usta) hisob',
-              onPress: () => {
-                setTicket(data.ticket || '');
-                setStep('register');
-              },
-            },
-            {
-              text: `Ha, ${label} sifatida kirish`,
-              onPress: () => handleClaimOtherActor(data.ticket, otherActor),
-            },
-          ]
-        );
+        console.log('[LoginScreen] raqam boshqa actorda topilgan -> usta sifatida ro\'yxatdan o\'tish davom etadi', { otherActor: data.other_actor });
+        setTicket(data.ticket || '');
+        setStep('register');
         return;
       }
       console.log('[LoginScreen] kutilmagan status', data?.status);

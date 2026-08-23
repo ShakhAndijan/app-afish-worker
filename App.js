@@ -1,5 +1,5 @@
-import { useState, useRef, useEffect } from 'react';
-import { StatusBar } from 'expo-status-bar';
+import { useState, useRef, useEffect } from "react";
+import { StatusBar } from "expo-status-bar";
 import {
   StyleSheet,
   Text,
@@ -10,24 +10,23 @@ import {
   FlatList,
   Image,
   RefreshControl,
-} from 'react-native';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import Feather from '@expo/vector-icons/Feather';
-import { COLORS } from './src/constants/colors';
-import { ENDPOINTS } from './src/constants/config';
-import LoginScreen from './src/screens/LoginScreen';
-import UstaMainScreen from './src/screens/UstaMainScreen';
-import ZakazchiMainScreen from './src/screens/ZakazchiMainScreen';
-import UstaDetailScreen from './src/screens/UstaDetailScreen';
-import { ThemeProvider } from './src/context/ThemeContext';
-import { UserProvider, clearCachedUser } from './src/context/UserContext';
-import { getCategories } from './src/api/categories';
-import { getWorkers } from './src/api/workers';
-import { getTopComments, getTopOrders } from './src/api/reviews';
-import { getToken, getActorType, clearTokens } from './src/utils/token';
-import AfishLoader from './src/components/AfishLoader';
+} from "react-native";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import Feather from "@expo/vector-icons/Feather";
+import { COLORS } from "./src/constants/colors";
+import { ENDPOINTS } from "./src/constants/config";
+import LoginScreen from "./src/screens/LoginScreen";
+import UstaMainScreen from "./src/screens/UstaMainScreen";
+import UstaDetailScreen from "./src/screens/UstaDetailScreen";
+import { ThemeProvider } from "./src/context/ThemeContext";
+import { UserProvider, clearCachedUser } from "./src/context/UserContext";
+import { getCategories } from "./src/api/categories";
+import { getWorkers } from "./src/api/workers";
+import { getTopComments, getTopOrders } from "./src/api/reviews";
+import { getToken, getActorType, clearTokens } from "./src/utils/token";
+import AfishLoader from "./src/components/AfishLoader";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
 
@@ -35,7 +34,7 @@ const STEPS = [
   {
     num: 1,
     title: "Ro'yxatdan o'ting",
-    desc: 'Kasbingiz va tajribangiz bo\'yicha profil yarating.',
+    desc: "Kasbingiz va tajribangiz bo'yicha profil yarating.",
   },
   {
     num: 2,
@@ -44,28 +43,28 @@ const STEPS = [
   },
   {
     num: 3,
-    title: 'Pul ishlang',
+    title: "Pul ishlang",
     desc: "Ishni sifatli bajaring va darhol to'lovingizni oling.",
   },
 ];
 
 const BENEFITS_DATA = [
   {
-    icon: 'wallet',
-    color: '#2ecc71',
+    icon: "wallet",
+    color: "#2ecc71",
     title: "Tezkor to'lov",
     desc: "Ishni yakunlagach, to'lov darhol hamyoningizga tushadi.",
   },
   {
-    icon: 'bullhorn-outline',
-    color: '#3b82f6',
+    icon: "bullhorn-outline",
+    color: "#3b82f6",
     title: "Ko'proq mijozlar",
     desc: "E'loningiz platformadagi minglab mijozlarga ko'rinadi.",
   },
   {
-    icon: 'clock-time-four',
-    color: '#f5b81f',
-    title: 'Erkin jadval',
+    icon: "clock-time-four",
+    color: "#f5b81f",
+    title: "Erkin jadval",
     desc: "Qachon va qancha ishlashni o'zingiz belgilaysiz.",
   },
 ];
@@ -119,7 +118,7 @@ function TaklifXizmatlar() {
         contentContainerStyle={tx.list}
         renderItem={({ item }) => (
           <TouchableOpacity style={tx.item} activeOpacity={0.8}>
-            <View style={[tx.iconBox, { backgroundColor: item.color + '18' }]}>
+            <View style={[tx.iconBox, { backgroundColor: item.color + "18" }]}>
               {item.icon ? (
                 <Text style={tx.emoji}>{item.icon}</Text>
               ) : (
@@ -143,29 +142,29 @@ function TaklifXizmatlar() {
 const tx = StyleSheet.create({
   container: { marginTop: 26, marginBottom: 6 },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 14,
   },
-  title: { color: COLORS.white, fontSize: 18, fontWeight: '700' },
-  link: { color: COLORS.orange, fontSize: 14, fontWeight: '600' },
+  title: { color: COLORS.white, fontSize: 18, fontWeight: "700" },
+  link: { color: COLORS.orange, fontSize: 14, fontWeight: "600" },
   list: { paddingHorizontal: 16, gap: 10 },
-  item: { width: 66, alignItems: 'center' },
+  item: { width: 66, alignItems: "center" },
   iconBox: {
     width: 56,
     height: 56,
     borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: 6,
   },
   label: {
     color: COLORS.gray,
     fontSize: 11,
-    fontWeight: '500',
-    textAlign: 'center',
+    fontWeight: "500",
+    textAlign: "center",
   },
   emoji: { fontSize: 24 },
 });
@@ -226,13 +225,13 @@ function EngZorUstalar({ onSelectUsta }) {
               <Text style={eu.loc}>{worker.location}</Text>
             </View>
             <Text style={eu.price}>
-              Narx:{' '}
+              Narx:{" "}
               <Text style={eu.priceBold}>{worker.startingPrice} so'm</Text> dan
             </Text>
           </View>
 
           {/* Rating */}
-          <View style={{ alignItems: 'flex-end', gap: 6 }}>
+          <View style={{ alignItems: "flex-end", gap: 6 }}>
             <View style={eu.ratingBox}>
               <Ionicons name="star" size={13} color="#FBBF24" />
               <Text style={eu.ratingText}>{worker.rating.toFixed(1)}</Text>
@@ -248,42 +247,42 @@ function EngZorUstalar({ onSelectUsta }) {
 const eu = StyleSheet.create({
   container: { marginTop: 28 },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 13,
   },
-  title: { color: COLORS.white, fontSize: 18, fontWeight: '700' },
-  link: { color: COLORS.orange, fontSize: 14, fontWeight: '600' },
+  title: { color: COLORS.white, fontSize: 18, fontWeight: "700" },
+  link: { color: COLORS.orange, fontSize: 14, fontWeight: "600" },
   card: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.card,
     marginHorizontal: 16,
     borderRadius: 18,
     padding: 13,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.06)',
+    borderColor: "rgba(255,255,255,0.06)",
   },
   rankBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: -7,
     left: -7,
-    backgroundColor: '#f5c451',
+    backgroundColor: "#f5c451",
     paddingHorizontal: 6,
     paddingVertical: 2,
     borderRadius: 7,
   },
-  rankText: { fontSize: 9, fontWeight: '800', color: '#3a2a08' },
+  rankText: { fontSize: 9, fontWeight: "800", color: "#3a2a08" },
   onlineDot: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 0,
     right: 0,
     width: 11,
     height: 11,
     borderRadius: 6,
-    backgroundColor: '#22C55E',
+    backgroundColor: "#22C55E",
     borderWidth: 2,
     borderColor: COLORS.card,
   },
@@ -291,37 +290,37 @@ const eu = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 15,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
-  avatarText: { color: COLORS.white, fontSize: 19, fontWeight: '700' },
+  avatarText: { color: COLORS.white, fontSize: 19, fontWeight: "700" },
   info: { flex: 1 },
   name: {
     color: COLORS.white,
     fontSize: 14.5,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 3,
   },
   metaRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 5,
     marginBottom: 3,
   },
   prof: { color: COLORS.gray, fontSize: 12 },
   loc: { color: COLORS.gray, fontSize: 11.5 },
   price: { fontSize: 12, color: COLORS.gray },
-  priceBold: { color: COLORS.white, fontWeight: '800' },
+  priceBold: { color: COLORS.white, fontWeight: "800" },
   ratingBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(245,196,81,0.13)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(245,196,81,0.13)",
     borderRadius: 8,
     paddingHorizontal: 8,
     paddingVertical: 4,
     gap: 3,
   },
-  ratingText: { color: '#FBBF24', fontSize: 12.5, fontWeight: '700' },
+  ratingText: { color: "#FBBF24", fontSize: 12.5, fontWeight: "700" },
   exp: { fontSize: 12, color: COLORS.gray },
 });
 
@@ -439,14 +438,14 @@ function WorkCard({ item }) {
 const ei = StyleSheet.create({
   container: { marginTop: 28, marginBottom: 6 },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: 16,
     marginBottom: 12,
   },
-  title: { color: COLORS.white, fontSize: 18, fontWeight: '700' },
-  link: { color: COLORS.orange, fontSize: 14, fontWeight: '600' },
+  title: { color: COLORS.white, fontSize: 18, fontWeight: "700" },
+  link: { color: COLORS.orange, fontSize: 14, fontWeight: "600" },
   list: { paddingHorizontal: 16, gap: EI_GAP },
   card: { width: EI_CARD_W },
   imgBox: {
@@ -455,52 +454,52 @@ const ei = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: 14,
     marginBottom: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   img: {
-    width: '100%',
-    height: '100%',
+    width: "100%",
+    height: "100%",
   },
   ratingBadge: {
-    position: 'absolute',
+    position: "absolute",
     top: 8,
     right: 8,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0,0,0,0.55)',
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "rgba(0,0,0,0.55)",
     borderRadius: 8,
     paddingHorizontal: 6,
     paddingVertical: 3,
     gap: 3,
   },
-  ratingBadgeText: { color: COLORS.white, fontSize: 11, fontWeight: '700' },
+  ratingBadgeText: { color: COLORS.white, fontSize: 11, fontWeight: "700" },
   navBtn: {
-    position: 'absolute',
-    top: '50%',
+    position: "absolute",
+    top: "50%",
     marginTop: -12,
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: "rgba(0,0,0,0.45)",
+    alignItems: "center",
+    justifyContent: "center",
   },
   navBtnLeft: { left: 6 },
   navBtnRight: { right: 6 },
   dots: {
-    position: 'absolute',
+    position: "absolute",
     bottom: 8,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    justifyContent: 'center',
+    flexDirection: "row",
+    justifyContent: "center",
     gap: 4,
   },
   dot: {
     width: 5,
     height: 5,
     borderRadius: 3,
-    backgroundColor: 'rgba(255,255,255,0.4)',
+    backgroundColor: "rgba(255,255,255,0.4)",
   },
   dotActive: {
     backgroundColor: COLORS.white,
@@ -509,7 +508,7 @@ const ei = StyleSheet.create({
   cardTitle: {
     color: COLORS.white,
     fontSize: 13,
-    fontWeight: '700',
+    fontWeight: "700",
     marginBottom: 3,
   },
   cardSub: { color: COLORS.gray, fontSize: 11 },
@@ -529,9 +528,10 @@ function PromoBanner({ onPress }) {
           style={{ opacity: 0.12 }}
         />
       </View>
-      <Text style={pb.heading}>Bugun ustaga{'\n'}aylaning</Text>
+      <Text style={pb.heading}>Bugun ustaga{"\n"}aylaning</Text>
       <Text style={pb.sub}>
-        1 200+ usta AFISH orqali doimiy{'\n'}buyurtma va barqaror daromad topmoqda.
+        1 200+ usta AFISH orqali doimiy{"\n"}buyurtma va barqaror daromad
+        topmoqda.
       </Text>
       <TouchableOpacity style={pb.cta} activeOpacity={0.85} onPress={onPress}>
         <Text style={pb.ctaTxt}>Ro'yxatdan o'tish</Text>
@@ -549,58 +549,62 @@ const pb = StyleSheet.create({
     borderRadius: 22,
     backgroundColor: COLORS.orange,
     padding: 22,
-    overflow: 'hidden',
+    overflow: "hidden",
   },
   glow: {
-    position: 'absolute',
+    position: "absolute",
     top: -60,
     right: -50,
     width: 220,
     height: 220,
     borderRadius: 110,
-    backgroundColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: "rgba(255,255,255,0.10)",
   },
-  iconBg: { position: 'absolute', right: -12, bottom: -20 },
+  iconBg: { position: "absolute", right: -12, bottom: -20 },
   heading: {
     fontSize: 21,
-    fontWeight: '800',
-    color: '#fff',
+    fontWeight: "800",
+    color: "#fff",
     lineHeight: 28,
     marginBottom: 8,
   },
   sub: {
     fontSize: 13.5,
-    color: 'rgba(255,255,255,0.92)',
+    color: "rgba(255,255,255,0.92)",
     lineHeight: 20,
     marginBottom: 18,
   },
   cta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     gap: 6,
-    alignSelf: 'flex-start',
-    backgroundColor: '#fff',
+    alignSelf: "flex-start",
+    backgroundColor: "#fff",
     borderRadius: 12,
     paddingVertical: 10,
     paddingHorizontal: 16,
   },
-  ctaTxt: { color: COLORS.orange, fontWeight: '700', fontSize: 14 },
+  ctaTxt: { color: COLORS.orange, fontWeight: "700", fontSize: 14 },
 });
 
 // ─── TrustRow ─────────────────────────────────────────────────────────────────
 
 const TRUST_ITEMS = [
-  { icon: 'wallet', color: '#2ecc71', label: "Tezkor to'lov" },
-  { icon: 'briefcase-check', color: '#3b82f6', label: "Ko'p buyurtma" },
-  { icon: 'lightning-bolt', color: '#f5b81f', label: '24/7 qo\'llab-quvvatlash' },
+  { icon: "wallet", color: "#2ecc71", label: "Tezkor to'lov" },
+  { icon: "briefcase-check", color: "#3b82f6", label: "Ko'p buyurtma" },
+  {
+    icon: "lightning-bolt",
+    color: "#f5b81f",
+    label: "24/7 qo'llab-quvvatlash",
+  },
 ];
 
 function TrustRow() {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        justifyContent: 'center',
+        flexDirection: "row",
+        justifyContent: "center",
         gap: 10,
         marginBottom: 10,
         paddingHorizontal: 16,
@@ -610,15 +614,15 @@ function TrustRow() {
         <View
           key={i}
           style={{
-            flexDirection: 'row',
-            alignItems: 'center',
+            flexDirection: "row",
+            alignItems: "center",
             gap: 6,
             backgroundColor: COLORS.card,
             paddingHorizontal: 13,
             paddingVertical: 9,
             borderRadius: 22,
             borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.07)',
+            borderColor: "rgba(255,255,255,0.07)",
           }}
         >
           <MaterialCommunityIcons
@@ -627,7 +631,7 @@ function TrustRow() {
             color={item.color}
           />
           <Text
-            style={{ fontSize: 12, color: COLORS.white, fontWeight: '600' }}
+            style={{ fontSize: 12, color: COLORS.white, fontWeight: "600" }}
           >
             {item.label}
           </Text>
@@ -640,9 +644,9 @@ function TrustRow() {
 // ─── StatsBand ────────────────────────────────────────────────────────────────
 
 const DEFAULT_STATS = [
-  ['1 200+', 'Faol usta'],
-  ['8 500+', 'Bajarilgan buyurtma'],
-  ['4.8★', "O'rtacha reyting"],
+  ["1 200+", "Faol usta"],
+  ["8 500+", "Bajarilgan buyurtma"],
+  ["4.8★", "O'rtacha reyting"],
 ];
 
 function StatsBand() {
@@ -656,8 +660,8 @@ function StatsBand() {
           const { worker_count, order_count, average_rating } =
             data.response_data;
           setStats([
-            [`${worker_count}+`, 'Faol usta'],
-            [`${order_count}+`, 'Bajarilgan buyurtma'],
+            [`${worker_count}+`, "Faol usta"],
+            [`${order_count}+`, "Bajarilgan buyurtma"],
             [`${average_rating.toFixed(1)}★`, "O'rtacha reyting"],
           ]);
         }
@@ -673,10 +677,10 @@ function StatsBand() {
         marginBottom: 28,
         backgroundColor: COLORS.card,
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        borderColor: "rgba(255,255,255,0.06)",
         borderRadius: 18,
         paddingVertical: 18,
-        flexDirection: 'row',
+        flexDirection: "row",
       }}
     >
       {stats.map(([v, l], i) => (
@@ -684,13 +688,13 @@ function StatsBand() {
           key={i}
           style={{
             flex: 1,
-            alignItems: 'center',
+            alignItems: "center",
             borderRightWidth: i < 2 ? 1 : 0,
-            borderRightColor: 'rgba(255,255,255,0.06)',
+            borderRightColor: "rgba(255,255,255,0.06)",
           }}
         >
           <Text
-            style={{ fontSize: 19, fontWeight: '800', color: COLORS.white }}
+            style={{ fontSize: 19, fontWeight: "800", color: COLORS.white }}
           >
             {v}
           </Text>
@@ -699,7 +703,7 @@ function StatsBand() {
               fontSize: 11,
               color: COLORS.gray,
               marginTop: 3,
-              textAlign: 'center',
+              textAlign: "center",
               paddingHorizontal: 4,
             }}
           >
@@ -719,21 +723,21 @@ function HowItWorks() {
       {STEPS.map((s) => (
         <View
           key={s.num}
-          style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 14 }}
+          style={{ flexDirection: "row", alignItems: "flex-start", gap: 14 }}
         >
           <View
             style={{
               width: 36,
               height: 36,
               borderRadius: 11,
-              backgroundColor: COLORS.orange + '22',
-              alignItems: 'center',
-              justifyContent: 'center',
+              backgroundColor: COLORS.orange + "22",
+              alignItems: "center",
+              justifyContent: "center",
               flexShrink: 0,
             }}
           >
             <Text
-              style={{ color: COLORS.orange, fontWeight: '800', fontSize: 15 }}
+              style={{ color: COLORS.orange, fontWeight: "800", fontSize: 15 }}
             >
               {s.num}
             </Text>
@@ -742,7 +746,7 @@ function HowItWorks() {
             <Text
               style={{
                 color: COLORS.white,
-                fontWeight: '700',
+                fontWeight: "700",
                 fontSize: 14.5,
                 marginBottom: 4,
               }}
@@ -816,22 +820,22 @@ function ReviewsSection() {
             borderRadius: 18,
             padding: 16,
             borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.06)',
+            borderColor: "rgba(255,255,255,0.06)",
           }}
         >
-          <View style={{ flexDirection: 'row', gap: 3, marginBottom: 10 }}>
+          <View style={{ flexDirection: "row", gap: 3, marginBottom: 10 }}>
             {[0, 1, 2, 3, 4].map((j) => (
               <Ionicons
                 key={j}
                 name="star"
                 size={14}
-                color={j < r.stars ? '#f5b81f' : '#2a3a4a'}
+                color={j < r.stars ? "#f5b81f" : "#2a3a4a"}
               />
             ))}
           </View>
           <Text
             style={{
-              color: '#c4cdd8',
+              color: "#c4cdd8",
               fontSize: 13.5,
               lineHeight: 20,
               marginBottom: 14,
@@ -839,24 +843,24 @@ function ReviewsSection() {
           >
             {r.text}
           </Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
             <View
               style={{
                 width: 34,
                 height: 34,
                 borderRadius: 10,
                 backgroundColor: r.color,
-                alignItems: 'center',
-                justifyContent: 'center',
+                alignItems: "center",
+                justifyContent: "center",
               }}
             >
-              <Text style={{ color: '#fff', fontWeight: '700', fontSize: 14 }}>
+              <Text style={{ color: "#fff", fontWeight: "700", fontSize: 14 }}>
                 {r.initial}
               </Text>
             </View>
             <View>
               <Text
-                style={{ color: COLORS.white, fontWeight: '600', fontSize: 13 }}
+                style={{ color: COLORS.white, fontWeight: "600", fontSize: 13 }}
               >
                 {r.name}
               </Text>
@@ -882,14 +886,14 @@ function BenefitsSection() {
         <View
           key={i}
           style={{
-            flexDirection: 'row',
-            alignItems: 'flex-start',
+            flexDirection: "row",
+            alignItems: "flex-start",
             gap: 14,
             backgroundColor: COLORS.card,
             borderRadius: 18,
             padding: 16,
             borderWidth: 1,
-            borderColor: 'rgba(255,255,255,0.06)',
+            borderColor: "rgba(255,255,255,0.06)",
           }}
         >
           <View
@@ -897,9 +901,9 @@ function BenefitsSection() {
               width: 46,
               height: 46,
               borderRadius: 13,
-              backgroundColor: b.color + '22',
-              alignItems: 'center',
-              justifyContent: 'center',
+              backgroundColor: b.color + "22",
+              alignItems: "center",
+              justifyContent: "center",
               flexShrink: 0,
             }}
           >
@@ -909,7 +913,7 @@ function BenefitsSection() {
             <Text
               style={{
                 color: COLORS.white,
-                fontWeight: '700',
+                fontWeight: "700",
                 fontSize: 14.5,
                 marginBottom: 4,
               }}
@@ -930,27 +934,27 @@ function BenefitsSection() {
 
 const INCOME_SAMPLES = [
   {
-    icon: 'water-pump',
-    color: '#3b82f6',
-    title: 'Santexnik',
+    icon: "water-pump",
+    color: "#3b82f6",
+    title: "Santexnik",
     range: "4 000 000 – 7 000 000 so'm",
   },
   {
-    icon: 'flash',
-    color: '#f5b81f',
-    title: 'Elektrik',
+    icon: "flash",
+    color: "#f5b81f",
+    title: "Elektrik",
     range: "3 500 000 – 6 500 000 so'm",
   },
   {
-    icon: 'hammer-wrench',
-    color: '#2ecc71',
-    title: 'Montajchi',
+    icon: "hammer-wrench",
+    color: "#2ecc71",
+    title: "Montajchi",
     range: "4 500 000 – 8 000 000 so'm",
   },
   {
-    icon: 'broom',
-    color: '#a78bfa',
-    title: 'Tozalash',
+    icon: "broom",
+    color: "#a78bfa",
+    title: "Tozalash",
     range: "2 500 000 – 4 500 000 so'm",
   },
 ];
@@ -978,7 +982,7 @@ function EarningsSection() {
   return (
     <View style={{ marginTop: 8, marginBottom: 6 }}>
       <View style={{ paddingHorizontal: 16, marginBottom: 4 }}>
-        <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: '700' }}>
+        <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: "700" }}>
           O'rtacha oylik daromad
         </Text>
         <Text style={{ color: COLORS.gray, fontSize: 12.5, marginTop: 4 }}>
@@ -991,7 +995,11 @@ function EarningsSection() {
         keyExtractor={(item) => item.title}
         horizontal
         showsHorizontalScrollIndicator={false}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, gap: INCOME_GAP }}
+        contentContainerStyle={{
+          paddingHorizontal: 16,
+          paddingTop: 12,
+          gap: INCOME_GAP,
+        }}
         renderItem={({ item }) => (
           <View
             style={{
@@ -1008,25 +1016,35 @@ function EarningsSection() {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                backgroundColor: item.color + '22',
-                alignItems: 'center',
-                justifyContent: 'center',
+                backgroundColor: item.color + "22",
+                alignItems: "center",
+                justifyContent: "center",
                 marginBottom: 12,
               }}
             >
-              <MaterialCommunityIcons name={item.icon} size={20} color={item.color} />
+              <MaterialCommunityIcons
+                name={item.icon}
+                size={20}
+                color={item.color}
+              />
             </View>
             <Text
               style={{
                 color: COLORS.white,
-                fontWeight: '700',
+                fontWeight: "700",
                 fontSize: 13.5,
                 marginBottom: 6,
               }}
             >
               {item.title}
             </Text>
-            <Text style={{ color: COLORS.orange, fontWeight: '800', fontSize: 12.5 }}>
+            <Text
+              style={{
+                color: COLORS.orange,
+                fontWeight: "800",
+                fontSize: 12.5,
+              }}
+            >
               {item.range}
             </Text>
             <Text style={{ color: COLORS.faint, fontSize: 10.5, marginTop: 2 }}>
@@ -1042,10 +1060,10 @@ function EarningsSection() {
 // ─── RequirementsSection ──────────────────────────────────────────────────────
 
 const REQUIREMENTS = [
-  'Pasport yoki ID karta',
+  "Pasport yoki ID karta",
   "Kamida 1 yillik tajriba (yoki tegishli sertifikat)",
-  'Ish uchun zarur asboblar',
-  'Faol telefon raqami',
+  "Ish uchun zarur asboblar",
+  "Faol telefon raqami",
 ];
 
 function RequirementsSection() {
@@ -1065,7 +1083,7 @@ function RequirementsSection() {
       {REQUIREMENTS.map((text, i) => (
         <View
           key={i}
-          style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+          style={{ flexDirection: "row", alignItems: "center", gap: 12 }}
         >
           <Ionicons name="checkmark-circle" size={20} color={COLORS.success} />
           <Text style={{ color: COLORS.white, fontSize: 13.5, flex: 1 }}>
@@ -1090,8 +1108,8 @@ function ReferralSection() {
         padding: 22,
         borderWidth: 1,
         borderColor: COLORS.border,
-        flexDirection: 'row',
-        alignItems: 'center',
+        flexDirection: "row",
+        alignItems: "center",
         gap: 16,
       }}
     >
@@ -1100,19 +1118,23 @@ function ReferralSection() {
           width: 54,
           height: 54,
           borderRadius: 16,
-          backgroundColor: COLORS.orange + '22',
-          alignItems: 'center',
-          justifyContent: 'center',
+          backgroundColor: COLORS.orange + "22",
+          alignItems: "center",
+          justifyContent: "center",
           flexShrink: 0,
         }}
       >
-        <MaterialCommunityIcons name="gift-outline" size={26} color={COLORS.orange} />
+        <MaterialCommunityIcons
+          name="gift-outline"
+          size={26}
+          color={COLORS.orange}
+        />
       </View>
       <View style={{ flex: 1 }}>
         <Text
           style={{
             color: COLORS.white,
-            fontWeight: '700',
+            fontWeight: "700",
             fontSize: 15,
             marginBottom: 4,
           }}
@@ -1139,28 +1161,28 @@ function ClosingCTA({ onPress }) {
         backgroundColor: COLORS.card,
         borderRadius: 22,
         padding: 24,
-        alignItems: 'center',
+        alignItems: "center",
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
-        overflow: 'hidden',
+        borderColor: "rgba(255,255,255,0.06)",
+        overflow: "hidden",
       }}
     >
       <View
         style={{
-          position: 'absolute',
+          position: "absolute",
           width: 220,
           height: 180,
-          backgroundColor: 'rgba(232,122,69,0.10)',
+          backgroundColor: "rgba(232,122,69,0.10)",
           borderRadius: 110,
         }}
       />
       <Text
         style={{
           color: COLORS.white,
-          fontWeight: '800',
+          fontWeight: "800",
           fontSize: 20,
           marginBottom: 8,
-          textAlign: 'center',
+          textAlign: "center",
           lineHeight: 27,
         }}
       >
@@ -1170,7 +1192,7 @@ function ClosingCTA({ onPress }) {
         style={{
           color: COLORS.gray,
           fontSize: 13.5,
-          textAlign: 'center',
+          textAlign: "center",
           marginBottom: 20,
           lineHeight: 20,
         }}
@@ -1181,18 +1203,18 @@ function ClosingCTA({ onPress }) {
         onPress={onPress}
         activeOpacity={0.85}
         style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
           backgroundColor: COLORS.orange,
           borderRadius: 14,
           paddingVertical: 14,
           gap: 8,
-          width: '100%',
+          width: "100%",
         }}
       >
         <Feather name="user-plus" size={18} color="#fff" />
-        <Text style={{ color: '#fff', fontWeight: '700', fontSize: 15 }}>
+        <Text style={{ color: "#fff", fontWeight: "700", fontSize: 15 }}>
           Kirish / Ro'yxatdan o'tish
         </Text>
       </TouchableOpacity>
@@ -1206,19 +1228,19 @@ function SectionHead({ title, link }) {
   return (
     <View
       style={{
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
         paddingHorizontal: 16,
         marginBottom: 14,
         marginTop: 28,
       }}
     >
-      <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: '700' }}>
+      <Text style={{ color: COLORS.white, fontSize: 18, fontWeight: "700" }}>
         {title}
       </Text>
       {link && (
-        <Text style={{ color: COLORS.orange, fontSize: 14, fontWeight: '600' }}>
+        <Text style={{ color: COLORS.orange, fontSize: 14, fontWeight: "600" }}>
           {link}
         </Text>
       )}
@@ -1229,8 +1251,8 @@ function SectionHead({ title, link }) {
 // ─── App ──────────────────────────────────────────────────────────────────────
 
 export default function App() {
-  const [searchText, setSearchText] = useState('');
-  const [screen, setScreen] = useState('home');
+  const [searchText, setSearchText] = useState("");
+  const [screen, setScreen] = useState("home");
   const [selectedUsta, setSelectedUsta] = useState(null);
   const [authChecked, setAuthChecked] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -1249,11 +1271,11 @@ export default function App() {
         if (token) {
           const actorType = await getActorType();
           setScreen(
-            actorType === 'worker' ? 'usta-dashboard' : 'zakazchi-dashboard'
+            actorType === "worker" ? "usta-dashboard" : "zakazchi-dashboard",
           );
         }
       } catch (e) {
-        console.log('[App] auth tekshirishda xatolik', e.message);
+        console.log("[App] auth tekshirishda xatolik", e.message);
       } finally {
         setAuthChecked(true);
       }
@@ -1267,7 +1289,7 @@ export default function App() {
         <View
           style={[
             styles.safeArea,
-            { alignItems: 'center', justifyContent: 'center' },
+            { alignItems: "center", justifyContent: "center" },
           ]}
         >
           <AfishLoader size={160} />
@@ -1285,23 +1307,25 @@ export default function App() {
           onBack={() => setSelectedUsta(null)}
           onGoToLogin={() => {
             setSelectedUsta(null);
-            setScreen('login');
+            setScreen("login");
           }}
         />
       </SafeAreaProvider>
     );
   }
 
-  if (screen === 'login') {
+  if (screen === "login") {
     return (
       <ThemeProvider>
         <SafeAreaProvider>
           <StatusBar style="light" />
           <LoginScreen
-            onBack={() => setScreen('home')}
+            onBack={() => setScreen("home")}
             onLoginSuccess={(actorType) =>
               setScreen(
-                actorType === 'worker' ? 'usta-dashboard' : 'zakazchi-dashboard'
+                actorType === "worker"
+                  ? "usta-dashboard"
+                  : "zakazchi-dashboard",
               )
             }
           />
@@ -1313,10 +1337,10 @@ export default function App() {
   const handleLogout = async () => {
     await clearTokens();
     await clearCachedUser();
-    setScreen('home');
+    setScreen("home");
   };
 
-  if (screen === 'usta-dashboard') {
+  if (screen === "usta-dashboard") {
     return (
       <ThemeProvider>
         <UserProvider>
@@ -1328,22 +1352,10 @@ export default function App() {
     );
   }
 
-  if (screen === 'zakazchi-dashboard') {
-    return (
-      <ThemeProvider>
-        <UserProvider>
-          <SafeAreaProvider>
-            <ZakazchiMainScreen onLogout={handleLogout} />
-          </SafeAreaProvider>
-        </UserProvider>
-      </ThemeProvider>
-    );
-  }
-
   return (
     <SafeAreaProvider>
       <StatusBar style="light" />
-      <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
+      <SafeAreaView style={styles.safeArea} edges={["top", "left", "right"]}>
         <ScrollView
           key={refreshKey}
           showsVerticalScrollIndicator={false}
@@ -1360,14 +1372,14 @@ export default function App() {
           {/* ── Header ── */}
           <View style={styles.header}>
             <Image
-              source={require('./assets/afish-logo-horizontal-pro.png')}
+              source={require("./assets/afish-logo-horizontal-pro.png")}
               style={styles.logoImg}
               resizeMode="contain"
             />
             <TouchableOpacity
               style={styles.loginBtn}
               activeOpacity={0.8}
-              onPress={() => setScreen('login')}
+              onPress={() => setScreen("login")}
             >
               <Feather
                 name="log-in"
@@ -1402,7 +1414,7 @@ export default function App() {
           </View>
 
           {/* ── Promo + Trust ── */}
-          <PromoBanner onPress={() => setScreen('login')} />
+          <PromoBanner onPress={() => setScreen("login")} />
           <TrustRow />
 
           {/* ── Taklif xizmatlar ── */}
@@ -1440,7 +1452,7 @@ export default function App() {
           <ReferralSection />
 
           {/* ── Closing CTA ── */}
-          <ClosingCTA onPress={() => setScreen('login')} />
+          <ClosingCTA onPress={() => setScreen("login")} />
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -1454,9 +1466,9 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 110 },
 
   header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 12,
@@ -1464,26 +1476,26 @@ const styles = StyleSheet.create({
   logoImg: { width: 170, height: 47 },
 
   loginBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.orange,
     paddingVertical: 9,
     paddingHorizontal: 16,
     borderRadius: 24,
   },
-  loginBtnTxt: { color: COLORS.white, fontWeight: '600', fontSize: 14 },
+  loginBtnTxt: { color: COLORS.white, fontWeight: "600", fontSize: 14 },
 
   searchRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     marginHorizontal: 16,
     marginTop: 4,
     gap: 10,
   },
   searchInner: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     backgroundColor: COLORS.card,
     borderRadius: 14,
     paddingHorizontal: 14,
@@ -1494,7 +1506,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: 14,
     padding: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

@@ -41,7 +41,7 @@ export async function getWorkers({ limit = 5, offset = 0, categoryId } = {}) {
   }
 
   const json = await res.json();
-  return (json.response_data ?? []).map(mapWorker);
+  return (json.response_data?.items ?? []).map(mapWorker);
 }
 
 /**

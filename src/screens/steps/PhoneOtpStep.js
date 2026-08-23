@@ -95,6 +95,22 @@ export default function PhoneOtpStep({
             </Text>
           </View>
 
+          {/* ── Ishonch chiplari ── */}
+          <View style={s.trustRow}>
+            <View style={[s.trustChip, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <MaterialCommunityIcons name="account-group-outline" size={14} color={theme.orange} />
+              <Text style={[s.trustTxt, { color: theme.text }]}>1 200+ faol usta</Text>
+            </View>
+            <View style={[s.trustChip, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <MaterialCommunityIcons name="wallet-outline" size={14} color={theme.green} />
+              <Text style={[s.trustTxt, { color: theme.text }]}>Tezkor to'lov</Text>
+            </View>
+            <View style={[s.trustChip, { backgroundColor: theme.card, borderColor: theme.border }]}>
+              <MaterialCommunityIcons name="shield-check-outline" size={14} color={theme.blue} />
+              <Text style={[s.trustTxt, { color: theme.text }]}>Xavfsiz kirish</Text>
+            </View>
+          </View>
+
           {/* ── Identifier field (telefon yoki email) ── */}
           <View style={s.fieldWrap}>
             <Text style={[s.fieldLabel, { color: theme.muted }]}>Telefon raqami yoki email</Text>
@@ -125,6 +141,22 @@ export default function PhoneOtpStep({
               <Text style={[s.errorTxt, { color: theme.red }]}>{error}</Text>
             </View>
           )}
+
+          {/* ── CTA ── */}
+          <TouchableOpacity
+            style={[s.cta, !isReady && s.ctaDisabled]}
+            onPress={isReady ? onContinue : undefined}
+            activeOpacity={0.85}
+          >
+            {loading ? (
+              <ActivityIndicator size="small" color="#fff" />
+            ) : (
+              <>
+                <Text style={[s.ctaTxt, !isReady && s.ctaTxtDisabled]}>Davom etish</Text>
+                <Feather name="arrow-right" size={18} color={isReady ? '#fff' : '#7a6253'} />
+              </>
+            )}
+          </TouchableOpacity>
 
           {/* ── Social ── */}
           <View style={s.orWrap}>
@@ -170,32 +202,21 @@ export default function PhoneOtpStep({
               <Text style={{ color: theme.text, fontWeight: '700' }}>Maxfiylik siyosati</Text>
               ga rozilik bildirasiz.
             </Text>
-            <TouchableOpacity onPress={onAltLogin} activeOpacity={0.7}>
-              <Text style={[s.altLink, { color: theme.orange }]}>
-                Boshqa yo'l bilan kirish
+            <TouchableOpacity onPress={onAltLogin} activeOpacity={0.7} style={s.altLinkWrap}>
+              <Text style={[s.altLinkHint, { color: theme.muted }]}>
+                Telefon yoki email bilan kirish sizga mos kelmadimi? Xavotir olmang,{'\n'}
+                boshqa usul bilan ham davom etishingiz mumkin.
               </Text>
+              <View style={s.altLinkRow}>
+                <Text style={[s.altLink, { color: theme.orange }]}>
+                  Boshqa yo'l bilan kirish
+                </Text>
+                <Feather name="arrow-right" size={14} color={theme.orange} />
+              </View>
             </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
-
-      {/* ── CTA (har doim klaviatura ustida ko'rinadi) ── */}
-      <View style={[s.ctaFooter, { backgroundColor: theme.bg, borderTopColor: theme.border }]}>
-        <TouchableOpacity
-          style={[s.cta, !isReady && s.ctaDisabled]}
-          onPress={isReady ? onContinue : undefined}
-          activeOpacity={0.85}
-        >
-          {loading ? (
-            <ActivityIndicator size="small" color="#fff" />
-          ) : (
-            <>
-              <Text style={[s.ctaTxt, !isReady && s.ctaTxtDisabled]}>Davom etish</Text>
-              <Feather name="arrow-right" size={18} color={isReady ? '#fff' : '#7a6253'} />
-            </>
-          )}
-        </TouchableOpacity>
-      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -257,6 +278,23 @@ const s = StyleSheet.create({
     maxWidth: 300,
   },
 
+  trustRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    gap: 8,
+  },
+  trustChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+    paddingVertical: 6,
+    paddingHorizontal: 11,
+    borderRadius: 20,
+    borderWidth: 1,
+  },
+  trustTxt: { fontSize: 11.5, fontWeight: '600' },
+
   fieldWrap: { gap: 8 },
   fieldLabel: { fontSize: 13, fontWeight: '600' },
 
@@ -271,12 +309,6 @@ const s = StyleSheet.create({
   },
   errorTxt: { flex: 1, fontSize: 12.5, fontWeight: '600', lineHeight: 17 },
 
-  ctaFooter: {
-    paddingHorizontal: 22,
-    paddingTop: 12,
-    paddingBottom: 16,
-    borderTopWidth: 1,
-  },
   cta: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -301,6 +333,14 @@ const s = StyleSheet.create({
 
   footer: { gap: 14, alignItems: 'center' },
   terms: { fontSize: 12, textAlign: 'center', lineHeight: 18 },
+  altLinkWrap: { alignItems: 'center', gap: 6 },
+  altLinkHint: {
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
+    lineHeight: 17,
+  },
+  altLinkRow: { flexDirection: 'row', alignItems: 'center', gap: 5 },
   altLink: { fontSize: 14, fontWeight: '700' },
 
   orWrap: { flexDirection: 'row', alignItems: 'center', gap: 12 },
