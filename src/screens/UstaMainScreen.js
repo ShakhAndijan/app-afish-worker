@@ -27,6 +27,7 @@ import CategoryDetailScreen from './CategoryDetailScreen';
 import EarningsScreen from './EarningsScreen';
 import PaymentHistoryScreen from './PaymentHistoryScreen';
 import WithdrawScreen from './WithdrawScreen';
+import BuyurtmalarScreen from './BuyurtmalarScreen';
 import ReviewDetailSheet from '../components/ReviewDetailSheet';
 
 const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
@@ -332,6 +333,55 @@ const MY_WORKS = [
   },
 ];
 
+// "Sizga tegishli e'lonlar" — platforma qoidasiga ko'ra har bir zakazchik
+// faqat bitta ustaga bog'langan bo'ladi va shu ustadan boshqasiga buyurtma
+// bera olmaydi. Shu sabab bu ro'yxatdagi barcha mijozlar aynan shu ustaga
+// "faqat sizga" tarzida ulangan — umumiy bozordagi ochiq e'lonlardan farqli.
+const LINKED_ELONLAR = [
+  {
+    id: 1,
+    client: CLIENTS.sardor,
+    category: 'Santexnika',
+    icon: 'wrench',
+    color: '#3f7fd4',
+    title: 'Vannaxonada trubadan suv oqmoqda',
+    description:
+      "Hammomdagi trubalardan suv oqyapti, tezroq kelib ko'rib berishingiz kerak.",
+    address: 'Chilonzor tumani, 19-mavze',
+    budget: '70 000 – 100 000',
+    postedAgo: '12 daqiqa oldin',
+    isNewClient: false,
+  },
+  {
+    id: 2,
+    client: CLIENTS.javlon,
+    category: 'Isitish tizimlari',
+    icon: 'radiator',
+    color: '#e87a45',
+    title: 'Radiatorni tozalash va sozlash',
+    description:
+      "Isitish mavsumidan oldin barcha radiatorlarni tekshirib, tozalab berishingizni so'rayman.",
+    address: "Mirzo Ulug'bek tumani",
+    budget: '150 000',
+    postedAgo: '40 daqiqa oldin',
+    isNewClient: false,
+  },
+  {
+    id: 3,
+    client: { id: 'c5', name: 'Diyor Nazarov', initial: 'D', color: '#e0473a' },
+    category: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    color: '#9b6cd1',
+    title: "Yangi konditsioner o'rnatish",
+    description:
+      "Yotoqxonaga yangi split konditsioner o'rnatib berish kerak, jihoz tayyor turibdi.",
+    address: 'Yashnobod tumani',
+    budget: '200 000',
+    postedAgo: '1 soat oldin',
+    isNewClient: true,
+  },
+];
+
 const MY_REVIEWS = [
   {
     id: 1,
@@ -517,6 +567,379 @@ function RecentWorksSection({ t, onSelect }) {
   );
 }
 
+function LinkedElonlarSection({ t, elonlar, onOpen }) {
+  if (!elonlar.length) return null;
+
+  return (
+    <View style={{ paddingHorizontal: 20, marginTop: 26 }}>
+      <SectionHeader theme={t} title="Sizga tegishli e'lonlar" />
+
+      <View
+        style={[
+          s.exclusiveBanner,
+          {
+            backgroundColor: 'rgba(232,122,69,0.12)',
+            borderColor: 'rgba(232,122,69,0.35)',
+          },
+        ]}
+      >
+        <Ionicons name="lock-closed" size={14} color={t.orange} />
+        <Text
+          style={{
+            flex: 1,
+            fontSize: 11,
+            fontWeight: '600',
+            color: t.orange,
+            marginLeft: 8,
+            lineHeight: 15,
+          }}
+        >
+          Bu mijozlar faqat sizga bog'langan — ular boshqa ustaga buyurtma bera olmaydi.
+        </Text>
+      </View>
+
+      <View style={{ gap: 10, marginTop: 12 }}>
+        {elonlar.map((e) => (
+          <TouchableOpacity
+            key={e.id}
+            style={[s.elonCard, { backgroundColor: t.card, borderColor: t.border }]}
+            activeOpacity={0.8}
+            onPress={() => onOpen(e)}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <Avatar letter={e.client.initial} bgColor={e.client.color} size={36} />
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <Text
+                    style={{ fontSize: 13.5, fontWeight: '700', color: t.text }}
+                    numberOfLines={1}
+                  >
+                    {e.client.name}
+                  </Text>
+                  <View style={[s.exclusiveTag, { backgroundColor: t.rowIconBg }]}>
+                    <Ionicons name="lock-closed" size={9} color={t.orange} />
+                    <Text
+                      style={{ fontSize: 9.5, fontWeight: '700', color: t.orange, marginLeft: 3 }}
+                    >
+                      Faqat sizga
+                    </Text>
+                  </View>
+                </View>
+                <Text style={{ fontSize: 11, color: t.muted, marginTop: 2 }}>
+                  {e.postedAgo}
+                  {e.isNewClient ? ' • Yangi mijoz' : ''}
+                </Text>
+              </View>
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 10 }}>
+              <MaterialCommunityIcons name={e.icon} size={14} color={e.color} />
+              <Text style={{ fontSize: 11.5, fontWeight: '700', color: e.color }}>
+                {e.category}
+              </Text>
+            </View>
+            <Text
+              style={{ fontSize: 13, fontWeight: '700', color: t.text, marginTop: 6 }}
+              numberOfLines={1}
+            >
+              {e.title}
+            </Text>
+            <Text
+              style={{ fontSize: 12, color: t.muted, marginTop: 3, lineHeight: 17 }}
+              numberOfLines={2}
+            >
+              {e.description}
+            </Text>
+
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 10,
+                paddingTop: 10,
+                borderTopWidth: 1,
+                borderTopColor: t.border,
+              }}
+            >
+              <Text style={{ fontSize: 11, color: t.faint, flex: 1 }} numberOfLines={1}>
+                {e.address}
+              </Text>
+              <Text style={{ fontSize: 12.5, fontWeight: '800', color: t.orange }}>
+                {e.budget} so'm
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+// "Yangi e'lonlar" — umumiy bozor: zakazchiklar tomonidan o'z kategoriyasi
+// bo'yicha tushirilgan, hali hech qaysi ustaga bog'lanmagan ochiq e'lonlar.
+// Bularni shu kategoriyadagi barcha ustalar ko'radi; qabul qilingandan
+// so'nggina mijoz o'sha ustaga eksklyuziv bog'lanadi.
+export const ALL_ELONLAR = [
+  {
+    id: 101,
+    client: { name: 'Baxtiyor Yusupov', initial: 'B', color: '#3f7fd4' },
+    category: 'Santexnika',
+    icon: 'wrench',
+    color: '#3f7fd4',
+    title: 'Oshxonada kran singan',
+    description: "Idish yuvish qismidagi kran singan, tezroq almashtirish kerak.",
+    address: 'Yunusobod tumani',
+    budget: '60 000 – 90 000',
+    postedAgo: '5 daqiqa oldin',
+  },
+  {
+    id: 102,
+    client: { name: 'Zarina Nortojiyeva', initial: 'Z', color: '#e87a45' },
+    category: 'Isitish tizimlari',
+    icon: 'radiator',
+    color: '#e87a45',
+    title: 'Kotyol ishlamayapti',
+    description: "Uy sovib ketdi, kotyol yonmayapti — bugun kelib ko'rib berish kerak.",
+    address: 'Yashnobod tumani',
+    budget: '150 000 – 200 000',
+    postedAgo: '10 daqiqa oldin',
+  },
+  {
+    id: 103,
+    client: { name: 'Davron Islomov', initial: 'D', color: '#9b6cd1' },
+    category: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    color: '#9b6cd1',
+    title: "2 xonaga konditsioner o'rnatish",
+    description: "Ikkita split konditsioner sotib olindi, o'rnatib berish kerak.",
+    address: 'Chilonzor tumani',
+    budget: '350 000',
+    postedAgo: '8 daqiqa oldin',
+  },
+  {
+    id: 104,
+    client: { name: 'Gulnora Tosheva', initial: 'G', color: '#2fa37a' },
+    category: 'Santexnika',
+    icon: 'wrench',
+    color: '#3f7fd4',
+    title: 'Unitaz tagidan suv sizmoqda',
+    description: "Bir necha kundan beri tagidan asta suv sizib chiqyapti.",
+    address: 'Chilonzor tumani',
+    budget: '80 000',
+    postedAgo: '18 daqiqa oldin',
+  },
+  {
+    id: 105,
+    client: { name: 'Aziz Rahimov', initial: 'A', color: '#e0473a' },
+    category: 'Isitish tizimlari',
+    icon: 'radiator',
+    color: '#e87a45',
+    title: 'Radiatorlarni almashtirish',
+    description: "Eskirgan 4 ta radiatorni yangisiga almashtirish kerak.",
+    address: "Mirzo Ulug'bek tumani",
+    budget: '400 000',
+    postedAgo: '22 daqiqa oldin',
+  },
+  {
+    id: 106,
+    client: { name: 'Shahnoza Yusupova', initial: 'S', color: '#3f7fd4' },
+    category: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    color: '#9b6cd1',
+    title: 'Konditsioner freonini quyish',
+    description: "Konditsioner soveutmay qoldi, freon quyilishi kerak.",
+    address: 'Yunusobod tumani',
+    budget: '130 000',
+    postedAgo: '25 daqiqa oldin',
+  },
+  {
+    id: 107,
+    client: { name: 'Rustam Qodirov', initial: 'R', color: '#9b6cd1' },
+    category: 'Santexnika',
+    icon: 'wrench',
+    color: '#3f7fd4',
+    title: 'Yangi kvartirada santexnika ulash',
+    description: "Yangi qurilgan kvartirada barcha santexnika jihozlarini ulab berish kerak.",
+    address: 'Sergeli tumani',
+    budget: '250 000',
+    postedAgo: '35 daqiqa oldin',
+  },
+  {
+    id: 108,
+    client: { name: 'Feruza Mahmudova', initial: 'F', color: '#2fa37a' },
+    category: 'Isitish tizimlari',
+    icon: 'radiator',
+    color: '#e87a45',
+    title: 'Isitish tizimida havo yig\'ilgan',
+    description: "Radiatorlar isimayapti, tizimdan havo chiqarish kerak bo'lishi mumkin.",
+    address: 'Shayxontohur tumani',
+    budget: '90 000',
+    postedAgo: '45 daqiqa oldin',
+  },
+  {
+    id: 109,
+    client: { name: 'Bekzod Nazarov', initial: 'B', color: '#e0473a' },
+    category: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    color: '#9b6cd1',
+    title: "Eski konditsionerni ko'chirish",
+    description: "Konditsioner boshqa xonaga ko'chirilishi, quvurlar qayta tortilishi kerak.",
+    address: 'Sergeli tumani',
+    budget: '180 000',
+    postedAgo: '40 daqiqa oldin',
+  },
+  {
+    id: 110,
+    client: { name: 'Malika Yoqubova', initial: 'M', color: '#3f7fd4' },
+    category: 'Santexnika',
+    icon: 'wrench',
+    color: '#3f7fd4',
+    title: 'Dush kabinasidan suv oqmoqda',
+    description: "Dush kabinasi tagidan pol ustiga suv oqib chiqyapti.",
+    address: 'Uchtepa tumani',
+    budget: '70 000',
+    postedAgo: '50 daqiqa oldin',
+  },
+  {
+    id: 111,
+    client: { name: 'Jasur Ergashev', initial: 'J', color: '#9b6cd1' },
+    category: 'Isitish tizimlari',
+    icon: 'radiator',
+    color: '#e87a45',
+    title: 'Yangi qavat uchun isitish montaji',
+    description: "Uy ustiga qurilgan yangi qavatga isitish tizimi o'tkazilishi kerak.",
+    address: 'Olmazor tumani',
+    budget: '600 000',
+    postedAgo: '1 soat 10 daqiqa oldin',
+  },
+  {
+    id: 112,
+    client: { name: 'Madina Qosimova', initial: 'M', color: '#e87a45' },
+    category: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    color: '#9b6cd1',
+    title: "Ofisga 3 ta konditsioner o'rnatish",
+    description: "Yangi ochilgan ofisga 3 ta split konditsioner o'rnatish kerak.",
+    address: "Mirzo Ulug'bek tumani",
+    budget: '900 000',
+    postedAgo: '55 daqiqa oldin',
+  },
+  {
+    id: 113,
+    client: { name: 'Sherzod Aliqulov', initial: 'S', color: '#2fa37a' },
+    category: 'Santexnika',
+    icon: 'wrench',
+    color: '#3f7fd4',
+    title: 'Trubalarni izolyatsiya qilish',
+    description: "Qish oldidan tashqi trubalarni sovuqdan izolyatsiya qilish kerak.",
+    address: 'Bektemir tumani',
+    budget: '120 000',
+    postedAgo: '1 soat oldin',
+  },
+  {
+    id: 114,
+    client: { name: 'Nilufar Sattorova', initial: 'N', color: '#e0473a' },
+    category: 'Isitish tizimlari',
+    icon: 'radiator',
+    color: '#e87a45',
+    title: "Termostat o'rnatish",
+    description: "Isitish tizimiga avtomatik termostat o'rnatib berish kerak.",
+    address: 'Yakkasaroy tumani',
+    budget: '110 000',
+    postedAgo: '1 soat 30 daqiqa oldin',
+  },
+  {
+    id: 115,
+    client: { name: 'Otabek Toshpulatov', initial: 'O', color: '#3f7fd4' },
+    category: "Konditsioner o'rnatish",
+    icon: 'air-conditioner',
+    color: '#9b6cd1',
+    title: 'Konditsioner tozalash va servis',
+    description: "Yozgi mavsum oldidan konditsionerni to'liq tozalab, servis qilish kerak.",
+    address: 'Bektemir tumani',
+    budget: '100 000',
+    postedAgo: '2 soat oldin',
+  },
+];
+
+const GENERAL_CARD_W = 210;
+const GENERAL_GAP = 12;
+
+function GeneralElonlarSection({ t, elonlar, onOpenAll }) {
+  const preview = elonlar.slice(0, 10);
+  if (!preview.length) return null;
+
+  return (
+    <View style={{ marginTop: 26 }}>
+      <View style={{ paddingHorizontal: 20 }}>
+        <SectionHeader theme={t} title="Yangi e'lonlar" action="Hammasi" onPress={onOpenAll} />
+        <Text style={{ fontSize: 11.5, color: t.muted, marginTop: -6, marginBottom: 10 }}>
+          Kategoriyangiz bo'yicha barcha ustalarga ochiq e'lonlar
+        </Text>
+      </View>
+      <FlatList
+        data={preview}
+        keyExtractor={(e) => String(e.id)}
+        horizontal
+        showsHorizontalScrollIndicator={false}
+        contentContainerStyle={{ paddingHorizontal: 20, gap: GENERAL_GAP }}
+        renderItem={({ item: e }) => (
+          <TouchableOpacity
+            style={[
+              s.generalCard,
+              { width: GENERAL_CARD_W, backgroundColor: t.card, borderColor: t.border },
+            ]}
+            activeOpacity={0.85}
+            onPress={onOpenAll}
+          >
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+              <MaterialCommunityIcons name={e.icon} size={14} color={e.color} />
+              <Text
+                style={{ fontSize: 11, fontWeight: '700', color: e.color, flex: 1 }}
+                numberOfLines={1}
+              >
+                {e.category}
+              </Text>
+              <Text style={{ fontSize: 10, color: t.faint }}>{e.postedAgo}</Text>
+            </View>
+            <Text
+              style={{ fontSize: 13, fontWeight: '700', color: t.text, marginTop: 8 }}
+              numberOfLines={1}
+            >
+              {e.title}
+            </Text>
+            <Text
+              style={{ fontSize: 11.5, color: t.muted, marginTop: 3, lineHeight: 16 }}
+              numberOfLines={2}
+            >
+              {e.description}
+            </Text>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                marginTop: 10,
+                paddingTop: 10,
+                borderTopWidth: 1,
+                borderTopColor: t.border,
+              }}
+            >
+              <Text style={{ fontSize: 10.5, color: t.faint, flex: 1 }} numberOfLines={1}>
+                {e.address}
+              </Text>
+              <Text style={{ fontSize: 12, fontWeight: '800', color: t.orange }}>
+                {e.budget} so'm
+              </Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
+  );
+}
+
 const USTA_TABS = [
   { key: 'home', label: 'Asosiy', on: 'home', off: 'home-outline' },
   { key: 'orders', label: 'Buyurtmalar', on: 'grid', off: 'grid-outline' },
@@ -535,6 +958,7 @@ export default function UstaMainScreen({ onLogout }) {
   const [selectedReview, setSelectedReview] = useState(null);
   const [categories, setCategories] = useState(MY_CATEGORIES);
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
+  const [linkedElonlar, setLinkedElonlar] = useState(LINKED_ELONLAR);
   const [showEarnings, setShowEarnings] = useState(false);
   const [showPaymentHistory, setShowPaymentHistory] = useState(false);
   const [showWithdraw, setShowWithdraw] = useState(false);
@@ -567,6 +991,25 @@ export default function UstaMainScreen({ onLogout }) {
   };
 
   const selectedCategory = categories.find((c) => c.id === selectedCategoryId) || null;
+
+  const handleLinkedElonDecision = (elon, accepted) => {
+    setLinkedElonlar((prev) => prev.filter((e) => e.id !== elon.id));
+    if (accepted) {
+      Alert.alert('Qabul qilindi', `${elon.client.name} bilan buyurtma tasdiqlandi.`);
+    }
+  };
+
+  const openLinkedElon = (elon) => {
+    Alert.alert(
+      elon.client.name,
+      `${elon.title}\n\n${elon.description}\n\n${elon.address} • ${elon.budget} so'm`,
+      [
+        { text: 'Rad etish', style: 'destructive', onPress: () => handleLinkedElonDecision(elon, false) },
+        { text: 'Qabul qilish', onPress: () => handleLinkedElonDecision(elon, true) },
+        { text: 'Bekor qilish', style: 'cancel' },
+      ]
+    );
+  };
 
   const updateCategory = (id, updates) => {
     setCategories((prev) =>
@@ -630,6 +1073,17 @@ export default function UstaMainScreen({ onLogout }) {
         onTabChange={setActiveTab}
         onLogout={onLogout}
         onOpenEarnings={() => setShowEarnings(true)}
+      />
+    );
+  }
+
+  if (activeTab === 'orders') {
+    return (
+      <BuyurtmalarScreen
+        t={t}
+        categories={categories}
+        elonlar={ALL_ELONLAR}
+        onTabChange={setActiveTab}
       />
     );
   }
@@ -794,94 +1248,8 @@ export default function UstaMainScreen({ onLogout }) {
           />
         </View>
 
-        {/* ── Moliya ── */}
-        <View style={{ paddingHorizontal: 20, marginTop: 24 }}>
-          <SectionHeader theme={t} title="Moliya" />
-        </View>
-
-        {/* ── Balance card ── */}
-        <View style={{ paddingHorizontal: 20 }}>
-          <View style={[s.balanceCard, { backgroundColor: t.orange }]}>
-            <View style={s.balanceCircle} />
-            <View
-              style={{
-                position: 'absolute',
-                right: 14,
-                bottom: 14,
-                opacity: 0.16,
-              }}
-            >
-              <MaterialCommunityIcons name="wallet" size={56} color="#fff" />
-            </View>
-            <Text style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.92)' }}>
-              Hisobingizdagi mablag'
-            </Text>
-            <Text style={s.balanceAmt}>
-              {fmt(BALANCE)} <Text style={s.balanceCur}>so'm</Text>
-            </Text>
-            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
-              <TouchableOpacity
-                style={s.btnWhite}
-                activeOpacity={0.8}
-                onPress={() => setShowWithdraw(true)}
-              >
-                <Text
-                  style={{ color: t.orangeD, fontWeight: '700', fontSize: 13 }}
-                >
-                  Pul yechish
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={s.btnOutline}
-                activeOpacity={0.8}
-                onPress={() => setShowPaymentHistory(true)}
-              >
-                <Text
-                  style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}
-                >
-                  Tarix
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </View>
-
-        {/* ── Today / Week ── */}
-        <View
-          style={{
-            flexDirection: 'row',
-            paddingHorizontal: 20,
-            marginTop: 16,
-            gap: 12,
-          }}
-        >
-          {[
-            { label: 'Bugun', val: '340 000', sub: '4 buyurtma' },
-            { label: 'Bu hafta', val: '1.8M', sub: "↑ 12% o'sish" },
-          ].map((item, i) => (
-            <View
-              key={i}
-              style={[s.miniCard, { flex: 1, backgroundColor: t.card, borderColor: t.border }]}
-            >
-              <Text style={{ fontSize: 11.5, color: t.muted }}>
-                {item.label}
-              </Text>
-              <Text
-                style={{
-                  fontWeight: '800',
-                  fontSize: 20,
-                  color: t.text,
-                  marginTop: 5,
-                }}
-              >
-                {item.val}
-              </Text>
-              <Text style={{ fontSize: 10.5, color: t.green, marginTop: 2 }}>
-                {item.sub}
-              </Text>
-            </View>
-          ))}
-        </View>
+        {/* ── Sizga tegishli e'lonlar ── */}
+        <LinkedElonlarSection t={t} elonlar={linkedElonlar} onOpen={openLinkedElon} />
 
         {/* ── Ish faoliyati ── */}
         <View style={{ paddingHorizontal: 20, marginTop: 26 }}>
@@ -1090,6 +1458,102 @@ export default function UstaMainScreen({ onLogout }) {
             })}
           </View>
         </View>
+
+        {/* ── Moliya ── */}
+        <View style={{ paddingHorizontal: 20, marginTop: 26 }}>
+          <SectionHeader theme={t} title="Moliya" />
+        </View>
+
+        {/* ── Balance card ── */}
+        <View style={{ paddingHorizontal: 20 }}>
+          <View style={[s.balanceCard, { backgroundColor: t.orange }]}>
+            <View style={s.balanceCircle} />
+            <View
+              style={{
+                position: 'absolute',
+                right: 14,
+                bottom: 14,
+                opacity: 0.16,
+              }}
+            >
+              <MaterialCommunityIcons name="wallet" size={56} color="#fff" />
+            </View>
+            <Text style={{ fontSize: 12.5, color: 'rgba(255,255,255,0.92)' }}>
+              Hisobingizdagi mablag'
+            </Text>
+            <Text style={s.balanceAmt}>
+              {fmt(BALANCE)} <Text style={s.balanceCur}>so'm</Text>
+            </Text>
+            <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
+              <TouchableOpacity
+                style={s.btnWhite}
+                activeOpacity={0.8}
+                onPress={() => setShowWithdraw(true)}
+              >
+                <Text
+                  style={{ color: t.orangeD, fontWeight: '700', fontSize: 13 }}
+                >
+                  Pul yechish
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={s.btnOutline}
+                activeOpacity={0.8}
+                onPress={() => setShowPaymentHistory(true)}
+              >
+                <Text
+                  style={{ color: '#fff', fontWeight: '700', fontSize: 13 }}
+                >
+                  Tarix
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+
+        {/* ── Today / Week ── */}
+        <View
+          style={{
+            flexDirection: 'row',
+            paddingHorizontal: 20,
+            marginTop: 16,
+            gap: 12,
+          }}
+        >
+          {[
+            { label: 'Bugun', val: '340 000', sub: '4 buyurtma' },
+            { label: 'Bu hafta', val: '1.8M', sub: "↑ 12% o'sish" },
+          ].map((item, i) => (
+            <View
+              key={i}
+              style={[s.miniCard, { flex: 1, backgroundColor: t.card, borderColor: t.border }]}
+            >
+              <Text style={{ fontSize: 11.5, color: t.muted }}>
+                {item.label}
+              </Text>
+              <Text
+                style={{
+                  fontWeight: '800',
+                  fontSize: 20,
+                  color: t.text,
+                  marginTop: 5,
+                }}
+              >
+                {item.val}
+              </Text>
+              <Text style={{ fontSize: 10.5, color: t.green, marginTop: 2 }}>
+                {item.sub}
+              </Text>
+            </View>
+          ))}
+        </View>
+
+        {/* ── Yangi e'lonlar (umumiy) ── */}
+        <GeneralElonlarSection
+          t={t}
+          elonlar={ALL_ELONLAR}
+          onOpenAll={() => setActiveTab('orders')}
+        />
       </ScrollView>
 
       <ReviewDetailSheet
@@ -1214,6 +1678,32 @@ const s = StyleSheet.create({
   },
 
   reviewCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 13,
+  },
+
+  exclusiveBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: 12,
+    borderWidth: 1,
+    padding: 10,
+    marginTop: 10,
+  },
+  exclusiveTag: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 999,
+  },
+  elonCard: {
+    borderRadius: 16,
+    borderWidth: 1,
+    padding: 13,
+  },
+  generalCard: {
     borderRadius: 16,
     borderWidth: 1,
     padding: 13,

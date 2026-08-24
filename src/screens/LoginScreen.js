@@ -8,6 +8,7 @@ import {
   loginWorker,
   authStart,
   authVerify,
+  authComplete,
   getTelegramConfig,
   telegramVerify,
   requestResetPasswordOtp,
@@ -96,6 +97,7 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
     console.log('[LoginScreen] kod qayta so\'ralmoqda', { identifier: identifier(), identifierMode, actorType });
     try {
       setOtpResendLoading(true);
+      setOtpConfirmError('');
       const data = await authStart(identifier(), channel, actorType);
       setOtpDevCode(data?.dev_code || '');
     } catch (e) {
@@ -136,7 +138,7 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
       setOtpConfirmLoading(true);
       setOtpConfirmError('');
       const data = await authVerify(identifier(), code, actorType);
-      console.log('[LoginScreen] 3-jarayon: verify natijasi', { status: data?.status, other_actor: data?.other_actor });
+      console.log('[LoginScreen] 3-jarayon: verify natijasi', { status: data?.status });
       if (data?.status === 'signed_in') {
         if (data.access_token) await saveToken(data.access_token);
         if (data.refresh_token) await saveRefreshToken(data.refresh_token);
@@ -145,18 +147,40 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
         (onLoginSuccess ?? onBack)(actorType);
         return;
       }
-      if (data?.status === 'needs_name') {
-        setTicket(data.ticket || '');
-        console.log('[LoginScreen] hisob topilmadi -> "register" (ism-familiya) bosqichiga o\'tildi');
+
+      // Hisob hali yakunlanmagan — faqat ikkita holat bor: (1) ism-familiya
+      // allaqachon ma'lum (raqam avval boshqa ko'rinishda ro'yxatdan o'tgan)
+      // -> so'ramasdan to'g'ridan-to'g'ri "complete"ga yuboramiz; (2) mutlaqo
+      // yangi hisob -> foydalanuvchidan so'raymiz. Claim endpointi
+      // ishlatilmaydi.
+      if (data?.suggested_first_name && data?.suggested_last_name) {
+        console.log('[LoginScreen] ism-familiya allaqachon ma\'lum -> avtomatik yakunlanmoqda', {
+          firstName: data.suggested_first_name,
+          lastName: data.suggested_last_name,
+        });
+        const resp = await authComplete(
+          data.ticket,
+          data.suggested_first_name,
+          data.suggested_last_name,
+          actorType
+        );
+        if (resp?.access_token) await saveToken(resp.access_token);
+        if (resp?.refresh_token) await saveRefreshToken(resp.refresh_token);
+        await saveActorType(actorType);
+        console.log('[LoginScreen] avtomatik ro\'yxatdan o\'tish tugadi -> kirildi', {
+          already_registered: resp?.already_registered,
+        });
+        (onLoginSuccess ?? onBack)(actorType);
+        return;
+      }
+
+      if (data?.ticket) {
+        setTicket(data.ticket);
+        console.log('[LoginScreen] yangi hisob -> "register" (ism-familiya) bosqichiga o\'tildi');
         setStep('register');
         return;
       }
-      if (data?.status === 'other_actor') {
-        console.log('[LoginScreen] raqam boshqa actorda topilgan -> usta sifatida ro\'yxatdan o\'tish davom etadi', { otherActor: data.other_actor });
-        setTicket(data.ticket || '');
-        setStep('register');
-        return;
-      }
+
       console.log('[LoginScreen] kutilmagan status', data?.status);
       setOtpConfirmError('Kutilmagan javob qaytdi');
     } catch (e) {
@@ -289,6 +313,7 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
           setStep('phone');
         }}
         onConfirm={handleConfirmOtp}
+        onChangeCode={() => setOtpConfirmError('')}
         onResend={handleResendOtp}
         resendLoading={otpResendLoading}
         confirmLoading={otpConfirmLoading}

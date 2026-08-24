@@ -122,8 +122,11 @@ export async function requestLoginOtp(phone) {
   return data.response_data; // { sent, dev_code }
 }
 
-// Yagona kirish/ro'yxatdan o'tish oqimi: start -> verify -> complete
-// (yoki verify "other_actor" qaytarsa -> claim). Har bir actor_type
+// Yagona kirish/ro'yxatdan o'tish oqimi: start -> verify -> complete.
+// Ikkita holat bor: (1) mutlaqo yangi raqam — ism-familiya so'raladi, yoki
+// (2) raqam avval boshqa actorda topilgan — bu holda backend
+// suggested_first_name/last_name qaytaradi va complete o'sha nom bilan
+// so'ramasdan chaqiriladi. Claim endpointi ishlatilmaydi. Har bir actor_type
 // (worker/customer) o'zining URL nomfazosiga ega, lekin so'rov shakli bir xil.
 function authEndpoint(actorType, name) {
   const prefix = actorType === 'customer' ? 'CUSTOMER_AUTH_' : 'WORKER_AUTH_';
@@ -189,26 +192,6 @@ export async function authComplete(ticket, firstName, lastName, actorType = 'wor
   }
   const data = await res.json();
   logAuth('complete', '<- javob', data.response_data); // { access_token, refresh_token, token_type, already_registered }
-  return data.response_data;
-}
-
-// actorType shu yerda "qaysi tomonga kirilyapti"ni bildiradi — verify
-// "other_actor" bilan qaytargan actor_type shu yerga beriladi.
-export async function authClaim(ticket, actorType) {
-  const url = authEndpoint(actorType, 'CLAIM');
-  logAuth('claim', '-> so\'rov', { url, ticket, actorType });
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ ticket }),
-  });
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    logAuth('claim', '<- xatolik', { status: res.status, err });
-    throw new Error(err.message || 'Hisobga kirishda xatolik yuz berdi');
-  }
-  const data = await res.json();
-  logAuth('claim', '<- javob', data.response_data); // { access_token, refresh_token, token_type, already_registered }
   return data.response_data;
 }
 

@@ -1,10 +1,12 @@
-import { View, Text, Image, StyleSheet, ActivityIndicator } from 'react-native';
-import { useState, useEffect } from 'react';
+import { View, Text, Image, StyleSheet, ActivityIndicator, AppState } from 'react-native';
+import { useState, useEffect, useRef } from 'react';
 
 import { COLORS } from '../../constants/colors';
 import BackBtn from '../../components/login/BackBtn';
 import OtpInput from '../../components/login/OtpInput';
 import PrimaryBtn from '../../components/login/PrimaryBtn';
+
+const TIMER_SECONDS = 60;
 
 const formatPhone = (raw = '') => {
   const d = raw.replace(/\D/g, '').slice(0, 9);
@@ -26,20 +28,45 @@ export default function CodeStep({
   resendLoading,
   error,
   confirmLoading,
+  onChangeCode,
 }) {
   const [code, setCode] = useState('');
-  const [timer, setTimer] = useState(60);
+  const [timer, setTimer] = useState(TIMER_SECONDS);
+  const deadlineRef = useRef(Date.now() + TIMER_SECONDS * 1000);
+
+  // Real vaqtga (deadline) asoslangan hisoblash — oddiy "t - 1" dekrement
+  // ilova fonda turganda JS taymerlari to'xtab qolgani sabab noto'g'ri
+  // bo'lardi (foydalanuvchi qaytganda sanoq to'xtagan joyidan davom etardi).
+  const recomputeTimer = () => {
+    const remaining = Math.max(0, Math.ceil((deadlineRef.current - Date.now()) / 1000));
+    setTimer(remaining);
+  };
 
   useEffect(() => {
     if (timer === 0) return;
-    const id = setTimeout(() => setTimer(t => t - 1), 1000);
+    const id = setTimeout(recomputeTimer, 1000);
     return () => clearTimeout(id);
   }, [timer]);
 
+  // Ilova fondan qaytganda haqiqiy o'tgan vaqtga qarab darhol to'g'irlaymiz,
+  // taymerning navbatdagi tikida emas — shu bilan 1 daqiqadan ko'p vaqt
+  // o'tgan bo'lsa "qayta yuborish" darhol chiqadi.
+  useEffect(() => {
+    const sub = AppState.addEventListener('change', (state) => {
+      if (state === 'active') recomputeTimer();
+    });
+    return () => sub.remove();
+  }, []);
+
   const handleBack = () => { setCode(''); onBack(); };
+  const handleChangeCode = (v) => {
+    setCode(v);
+    onChangeCode?.();
+  };
   const resend = async () => {
     setCode('');
-    setTimer(60);
+    deadlineRef.current = Date.now() + TIMER_SECONDS * 1000;
+    setTimer(TIMER_SECONDS);
     if (onResend) await onResend();
   };
 
@@ -69,7 +96,7 @@ export default function CodeStep({
         </Text>
       </View>
 
-      <OtpInput value={code} onChange={setCode} length={6} />
+      <OtpInput value={code} onChange={handleChangeCode} length={6} />
 
       {!!devCode && (
         <Text style={styles.devCode}>
