@@ -15,7 +15,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import SuccessModal from '../components/SuccessModal';
 
-const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+import { formatAmount } from '../utils/format';
 const onlyDigits = (str) => (str || '').replace(/\D/g, '');
 const PAYOUT_CARDS = [
   { id: 'humo', label: "Humo ··42", icon: 'credit-card-outline' },
@@ -83,7 +83,7 @@ export default function WithdrawScreen({ t, balance = 1840000, onBack }) {
               Mavjud mablag'
             </Text>
             <Text style={s.balanceAmt}>
-              {fmt(balance)} <Text style={s.balanceCur}>so'm</Text>
+              {formatAmount(balance)} <Text style={s.balanceCur}>so'm</Text>
             </Text>
           </View>
 
@@ -191,7 +191,7 @@ export default function WithdrawScreen({ t, balance = 1840000, onBack }) {
         title="So'rov qabul qilindi"
         message={
           success
-            ? `${fmt(success.amount)} so'm ${success.card?.label} kartasiga 1-3 ish kuni ichida o'tkaziladi.`
+            ? `${formatAmount(success.amount)} so'm ${success.card?.label} kartasiga 1-3 ish kuni ichida o'tkaziladi.`
             : ''
         }
         buttonText="Tushunarli"

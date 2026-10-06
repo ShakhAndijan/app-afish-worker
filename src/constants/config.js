@@ -1,4 +1,16 @@
-export const API_BASE_URL = 'https://dev-back.afish.uz';
+// Backend manzili build vaqtida EXPO_PUBLIC_API_URL env o'zgaruvchisidan olinadi
+// (.env.local yoki eas.json dagi profil env'i). Release build'da u berilmasa,
+// tasodifan dev serverga ulanib qolmaslik uchun ilova aniq xato bilan to'xtaydi.
+const DEV_API_URL = 'https://dev-back.afish.uz';
+
+function resolveApiBaseUrl() {
+  const url = process.env.EXPO_PUBLIC_API_URL?.trim();
+  if (url) return url.replace(/\/+$/, '');
+  if (__DEV__) return DEV_API_URL;
+  throw new Error('EXPO_PUBLIC_API_URL sozlanmagan');
+}
+
+export const API_BASE_URL = resolveApiBaseUrl();
 
 export const ENDPOINTS = {
   AUTH_GOOGLE_LOGIN: `${API_BASE_URL}/api/v1/auth/google/login`,
@@ -16,6 +28,7 @@ export const ENDPOINTS = {
   CUSTOMER_AUTH_START: `${API_BASE_URL}/api/v1/auth/customer/start`,
   CUSTOMER_AUTH_VERIFY: `${API_BASE_URL}/api/v1/auth/customer/verify`,
   CUSTOMER_AUTH_COMPLETE: `${API_BASE_URL}/api/v1/auth/customer/complete`,
+  AUTH_REFRESH: `${API_BASE_URL}/api/v1/auth/refresh`,
   AUTH_ME: `${API_BASE_URL}/api/v1/auth/me`,
   AUTH_SET_PASSWORD: `${API_BASE_URL}/api/v1/auth/set-password`,
   AUTH_CHANGE_PHONE_REQUEST_OTP: `${API_BASE_URL}/api/v1/auth/change-phone/request-otp`,
@@ -43,5 +56,3 @@ export const ENDPOINTS = {
   CUSTOMER_AVATAR_CONFIRM: `${API_BASE_URL}/api/v1/customers/me/avatar/confirm`,
   CUSTOMER_AVATAR: `${API_BASE_URL}/api/v1/customers/me/avatar`,
 };
-// https://engraver-garnet-scalded.ngrok-free.dev
-// http://10.240.8.109:9494

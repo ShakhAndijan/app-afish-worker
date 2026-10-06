@@ -6,17 +6,8 @@ import BackBtn from '../../components/login/BackBtn';
 import OtpInput from '../../components/login/OtpInput';
 import PrimaryBtn from '../../components/login/PrimaryBtn';
 
+import { formatPhone } from '../../utils/format';
 const TIMER_SECONDS = 60;
-
-const formatPhone = (raw = '') => {
-  const d = raw.replace(/\D/g, '').slice(0, 9);
-  let s = '';
-  if (d.length > 0) s += d.slice(0, 2);
-  if (d.length > 2) s += ' ' + d.slice(2, 5);
-  if (d.length > 5) s += ' ' + d.slice(5, 7);
-  if (d.length > 7) s += ' ' + d.slice(7, 9);
-  return s;
-};
 
 export default function CodeStep({
   phone,

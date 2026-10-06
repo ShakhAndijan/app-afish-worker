@@ -13,8 +13,7 @@ import Feather from '@expo/vector-icons/Feather';
 import { useTheme } from '../context/ThemeContext';
 import OrderDetailScreen from './OrderDetailScreen';
 
-const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
+import { formatNumber } from '../utils/format';
 // Namunaviy ish rasmlari — lokal assetlar, tarmoqqa bog'liq bo'lmasligi uchun.
 const PHOTOS = [
   require('../../assets/mock/photo-01.png'),
@@ -291,7 +290,7 @@ function OrderCard({ order, onPress, t }) {
       <View style={[s.priceRow, { borderTopColor: t.border }]}>
         <View>
           <Text style={[s.price, { color: t.text }]}>
-            {fmt(order.price)}{' '}
+            {formatNumber(order.price)}{' '}
             <Text style={[s.priceSub, { color: t.muted }]}>so'm</Text>
           </Text>
         </View>
@@ -378,7 +377,7 @@ export default function ZakazchiOrdersScreen({ onBack }) {
             icon="credit-card"
             iconColor={t.gold}
             iconBg="rgba(245,196,81,0.14)"
-            value={`${fmt(TOTAL_SPENT / 1000)}k`}
+            value={`${formatNumber(TOTAL_SPENT / 1000)}k`}
             label="Sarflandi, so'm"
             t={t}
           />

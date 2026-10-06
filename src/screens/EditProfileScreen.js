@@ -26,6 +26,7 @@ import { getCustomerMe, updateCustomerMe } from '../api/user';
 import SuccessModal from '../components/SuccessModal';
 import AfishLoader from '../components/AfishLoader';
 
+import { MONTH_NAMES_UZ, pad2, daysInMonth } from '../utils/format';
 // Backend hali javob bermasa ham forma bo'sh qolmasligi uchun mahalliy zaxira
 // ro'yxatlar — real API javob bersa, ular ustidan yoziladi.
 const FALLBACK_GENDERS = [
@@ -46,22 +47,6 @@ const FALLBACK_DISTRICTS = [
   { id: 4, name: 'Sergeli' },
   { id: 5, name: 'Shayxontohur' },
 ];
-const MONTH_NAMES_UZ = [
-  'Yanvar',
-  'Fevral',
-  'Mart',
-  'Aprel',
-  'May',
-  'Iyun',
-  'Iyul',
-  'Avgust',
-  'Sentyabr',
-  'Oktyabr',
-  'Noyabr',
-  'Dekabr',
-];
-const pad2 = (n) => String(n).padStart(2, '0');
-const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
 const parseIsoDate = (str) => {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(str || '');
   if (!m) return null;

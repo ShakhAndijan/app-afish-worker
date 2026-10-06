@@ -12,8 +12,7 @@ import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Feather from '@expo/vector-icons/Feather';
 import { useTheme } from '../context/ThemeContext';
 
-const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
-
+import { formatNumber } from '../utils/format';
 const TYPE_CFG = {
   master_payment: { label: "Ustaga to'lov", icon: 'account-hard-hat', color: '#e87a45' },
   topup: { label: "Hamyon to'ldirish", icon: 'wallet-plus-outline', color: '#2fa37a' },
@@ -240,7 +239,7 @@ function TransactionCard({ tx, t }) {
       <View style={[s.amountRow, { borderTopColor: t.border }]}>
         <Text style={[s.amountLabel, { color: t.muted }]}>Summa</Text>
         <Text style={[s.amount, { color: isIn ? '#2fa37a' : t.text }]}>
-          {isIn ? '+' : '-'} {fmt(tx.amount)} <Text style={[s.amountSub, { color: t.muted }]}>so'm</Text>
+          {isIn ? '+' : '-'} {formatNumber(tx.amount)} <Text style={[s.amountSub, { color: t.muted }]}>so'm</Text>
         </Text>
       </View>
     </View>
@@ -282,7 +281,7 @@ export default function PaymentHistoryScreen({ onBack }) {
           <StatCell
             icon="account-hard-hat"
             color="#e87a45"
-            value={`${fmt(TOTAL_TO_MASTERS / 1000)}k`}
+            value={`${formatNumber(TOTAL_TO_MASTERS / 1000)}k`}
             label="Ustalarga, so'm"
             t={t}
             border
@@ -290,7 +289,7 @@ export default function PaymentHistoryScreen({ onBack }) {
           <StatCell
             icon="wallet-plus-outline"
             color="#2fa37a"
-            value={`${fmt(TOTAL_INCOMING / 1000)}k`}
+            value={`${formatNumber(TOTAL_INCOMING / 1000)}k`}
             label="Hamyonga, so'm"
             t={t}
           />

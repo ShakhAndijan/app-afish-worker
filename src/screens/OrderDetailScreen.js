@@ -16,9 +16,8 @@ import Feather from '@expo/vector-icons/Feather';
 import { useTheme } from '../context/ThemeContext';
 import UstaDetailScreen from './UstaDetailScreen';
 
+import { formatNumber } from '../utils/format';
 const HIT_SLOP = { top: 10, bottom: 10, left: 10, right: 10 };
-
-const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
 const STATUS_CFG = {
   done: {
@@ -169,7 +168,7 @@ export default function OrderDetailScreen({ order, onBack }) {
 
   const share = () => {
     Share.share({
-      message: `Buyurtma #${order.id} — ${order.task}. Holati: ${cfg.label}. ${fmt(order.price)} so'm.`,
+      message: `Buyurtma #${order.id} — ${order.task}. Holati: ${cfg.label}. ${formatNumber(order.price)} so'm.`,
     }).catch(() => {});
   };
 
@@ -325,11 +324,11 @@ export default function OrderDetailScreen({ order, onBack }) {
             <View style={[styles.priceCard, { backgroundColor: t.card, borderColor: t.border }]}>
               <View style={styles.priceHeaderRow}>
                 <Text style={[styles.priceTotalLabel, { color: t.muted }]}>Umumiy narx</Text>
-                <Text style={[styles.priceTotalValue, { color: t.text }]}>{fmt(order.price)} so'm</Text>
+                <Text style={[styles.priceTotalValue, { color: t.text }]}>{formatNumber(order.price)} so'm</Text>
               </View>
               <View style={[styles.priceDivider, { backgroundColor: t.border }]} />
-              <InfoRow icon="package" label="Materiallar" value={`${fmt(material)} so'm`} t={t} />
-              <InfoRow icon="tool" label="Ish haqi" value={`${fmt(labor)} so'm`} t={t} />
+              <InfoRow icon="package" label="Materiallar" value={`${formatNumber(material)} so'm`} t={t} />
+              <InfoRow icon="tool" label="Ish haqi" value={`${formatNumber(labor)} so'm`} t={t} />
             </View>
           </>
         )}

@@ -16,16 +16,19 @@ import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import Feather from "@expo/vector-icons/Feather";
 import { COLORS } from "./src/constants/colors";
-import { ENDPOINTS } from "./src/constants/config";
 import LoginScreen from "./src/screens/LoginScreen";
 import UstaMainScreen from "./src/screens/UstaMainScreen";
 import UstaDetailScreen from "./src/screens/UstaDetailScreen";
 import { ThemeProvider } from "./src/context/ThemeContext";
 import { UserProvider, clearCachedUser } from "./src/context/UserContext";
+import { QueryClientProvider, useQuery } from "@tanstack/react-query";
+import { queryClient } from "./src/api/queryClient";
 import { getCategories } from "./src/api/categories";
 import { getWorkers } from "./src/api/workers";
 import { getTopComments, getTopOrders } from "./src/api/reviews";
+import { getSystemStats } from "./src/api/system";
 import { getToken, getActorType, clearTokens } from "./src/utils/token";
+import { onSessionExpired } from "./src/utils/apiClient";
 import AfishLoader from "./src/components/AfishLoader";
 
 // ─── Data ─────────────────────────────────────────────────────────────────────
@@ -74,17 +77,12 @@ const BENEFITS_DATA = [
 const ITEM_SLOT = 76;
 
 function TaklifXizmatlar() {
-  const [categories, setCategories] = useState([]);
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: getCategories,
+  });
   const flatListRef = useRef(null);
   const activeIndexRef = useRef(0);
-
-  useEffect(() => {
-    getCategories()
-      .then((data) => {
-        setCategories(data);
-      })
-      .catch((error) => {});
-  }, []);
 
   useEffect(() => {
     if (categories.length === 0) return;
@@ -649,25 +647,19 @@ const DEFAULT_STATS = [
   ["4.8★", "O'rtacha reyting"],
 ];
 
-function StatsBand() {
-  const [stats, setStats] = useState(DEFAULT_STATS);
+const toStats = ({ worker_count, order_count, average_rating }) => [
+  [`${worker_count}+`, "Faol usta"],
+  [`${order_count}+`, "Bajarilgan buyurtma"],
+  [`${average_rating.toFixed(1)}★`, "O'rtacha reyting"],
+];
 
-  useEffect(() => {
-    fetch(ENDPOINTS.SYSTEM_STATS)
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.success && data.response_data) {
-          const { worker_count, order_count, average_rating } =
-            data.response_data;
-          setStats([
-            [`${worker_count}+`, "Faol usta"],
-            [`${order_count}+`, "Bajarilgan buyurtma"],
-            [`${average_rating.toFixed(1)}★`, "O'rtacha reyting"],
-          ]);
-        }
-      })
-      .catch((err) => {});
-  }, []);
+function StatsBand() {
+  // So'rov muvaffaqiyatsiz bo'lsa, standart qiymatlar ko'rsatilaveradi.
+  const { data } = useQuery({
+    queryKey: ["system-stats"],
+    queryFn: getSystemStats,
+  });
+  const stats = data ? toStats(data) : DEFAULT_STATS;
 
   return (
     <View
@@ -1250,7 +1242,7 @@ function SectionHead({ title, link }) {
 
 // ─── App ──────────────────────────────────────────────────────────────────────
 
-export default function App() {
+function AppContent() {
   const [searchText, setSearchText] = useState("");
   const [screen, setScreen] = useState("home");
   const [selectedUsta, setSelectedUsta] = useState(null);
@@ -1274,13 +1266,24 @@ export default function App() {
             actorType === "worker" ? "usta-dashboard" : "zakazchi-dashboard",
           );
         }
-      } catch (e) {
-        console.log("[App] auth tekshirishda xatolik", e.message);
+      } catch {
+        // Token o'qib bo'lmasa — mehmon sifatida bosh sahifa ochiladi.
       } finally {
         setAuthChecked(true);
       }
     })();
   }, []);
+
+  // Refresh token ham yaroqsiz bo'lsa (apiClient tokenlarni tozalagan) —
+  // keshni o'chirib, foydalanuvchini bosh sahifaga qaytaramiz.
+  useEffect(
+    () =>
+      onSessionExpired(() => {
+        clearCachedUser();
+        setScreen("home");
+      }),
+    [],
+  );
 
   if (!authChecked) {
     return (
@@ -1510,3 +1513,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
 });
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppContent />
+    </QueryClientProvider>
+  );
+}

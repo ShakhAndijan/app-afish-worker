@@ -12,8 +12,8 @@ import { StatusBar } from 'expo-status-bar';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import { useTheme } from '../context/ThemeContext';
 
-const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
 
+import { formatNumber } from '../utils/format';
 const PROMO = [
   {
     id: 'p1', code: 'USTA20', type: 'percent', value: 20, cap: 50000,
@@ -57,7 +57,7 @@ const PCOUNTS = {
 function PromoCard({ p, t }) {
   const [copied, setCopied] = useState(false);
   const dim = p.status !== 'active';
-  const valueLabel = p.type === 'percent' ? `${p.value}%` : fmt(p.value);
+  const valueLabel = p.type === 'percent' ? `${p.value}%` : formatNumber(p.value);
   const valueSub = p.type === 'percent' ? 'chegirma' : "so'm";
 
   const onCopy = () => {
@@ -73,7 +73,7 @@ function PromoCard({ p, t }) {
         <Text style={s.stubValue}>{valueLabel}</Text>
         <Text style={s.stubSub}>{valueSub}</Text>
         {p.cap && p.type === 'percent' && (
-          <Text style={s.stubCap}>{fmt(p.cap)} so'm{'\n'}gacha</Text>
+          <Text style={s.stubCap}>{formatNumber(p.cap)} so'm{'\n'}gacha</Text>
         )}
       </View>
 

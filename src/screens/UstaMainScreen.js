@@ -30,7 +30,7 @@ import WithdrawScreen from './WithdrawScreen';
 import BuyurtmalarScreen from './BuyurtmalarScreen';
 import ReviewDetailSheet from '../components/ReviewDetailSheet';
 
-const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+import { formatAmount } from '../utils/format';
 const BALANCE = 1840000;
 
 const WEEK = [
@@ -1482,7 +1482,7 @@ export default function UstaMainScreen({ onLogout }) {
               Hisobingizdagi mablag'
             </Text>
             <Text style={s.balanceAmt}>
-              {fmt(BALANCE)} <Text style={s.balanceCur}>so'm</Text>
+              {formatAmount(BALANCE)} <Text style={s.balanceCur}>so'm</Text>
             </Text>
             <View style={{ flexDirection: 'row', gap: 10, marginTop: 16 }}>
               <TouchableOpacity

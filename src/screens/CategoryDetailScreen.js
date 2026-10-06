@@ -16,7 +16,7 @@ import { StatusBar } from 'expo-status-bar';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-const fmt = (n) => n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+import { formatNumber } from '../utils/format';
 const onlyDigits = (str) => (str || '').replace(/\D/g, '');
 const PRICE_TYPES = ['Ish uchun', 'Soatlik', 'Kvadrat metr uchun', 'Kunlik'];
 
@@ -45,8 +45,8 @@ function CategoryEditSheet({ visible, category, onClose, onSave, t }) {
     const cleanPrice = onlyDigits(price);
     const cleanMinPrice = onlyDigits(minPrice);
     onSave({
-      price: cleanPrice ? fmt(cleanPrice) : category.price,
-      minPrice: cleanMinPrice ? fmt(cleanMinPrice) : category.minPrice,
+      price: cleanPrice ? formatNumber(cleanPrice) : category.price,
+      minPrice: cleanMinPrice ? formatNumber(cleanMinPrice) : category.minPrice,
       priceType,
       experienceYears,
       negotiable,
@@ -184,7 +184,7 @@ function CategoryEditSheet({ visible, category, onClose, onSave, t }) {
             </View>
             {!!price && (
               <Text style={{ fontSize: 11.5, color: t.faint, marginTop: -4 }}>
-                Ko'rinishi: {fmt(price)} so'mdan boshlab · {priceType}
+                Ko'rinishi: {formatNumber(price)} so'mdan boshlab · {priceType}
               </Text>
             )}
 
@@ -289,7 +289,7 @@ export default function CategoryDetailScreen({ category, works = [], t, onBack, 
 
   const stats = [
     { icon: 'briefcase-check-outline', value: String(works.length), label: 'Bajarilgan ish' },
-    { icon: 'cash-multiple', value: `${fmt(totalEarned)}`, label: "So'm daromad" },
+    { icon: 'cash-multiple', value: `${formatNumber(totalEarned)}`, label: "So'm daromad" },
     { icon: 'star-outline', value: avgRating ?? '—', label: "O'rtacha baho" },
   ];
 

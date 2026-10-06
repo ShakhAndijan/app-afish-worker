@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS } from '../../constants/colors';
 import { authComplete } from '../../api/auth';
-import { saveToken, saveRefreshToken, saveActorType } from '../../utils/token';
+import { saveSession } from '../../utils/token';
 
 // Telefon start/verify orqali allaqachon tasdiqlangan (ticket shu buni
 // isbotlaydi) — shu sabab bu yerda faqat ism-familiya so'raladi, qolgan
@@ -250,24 +250,17 @@ export default function WorkerRegisterStep({ onBack, onDone, ticket }) {
   const ok = firstName.trim() && lastName.trim();
 
   const finish = async () => {
-    console.log('[WorkerRegisterStep] 5-jarayon: ro\'yxatdan o\'tish yakunlanmoqda', {
-      ticket,
-      firstName,
-      lastName,
-    });
     setLoading(true);
     setFinishError('');
     try {
       const resp = await authComplete(ticket, firstName.trim(), lastName.trim(), 'worker');
-      if (resp?.access_token) await saveToken(resp.access_token);
-      if (resp?.refresh_token) await saveRefreshToken(resp.refresh_token);
-      await saveActorType('worker');
-      console.log('[WorkerRegisterStep] ro\'yxatdan o\'tish tugadi -> kirildi', {
-        already_registered: resp?.already_registered,
+      await saveSession({
+        accessToken: resp?.access_token,
+        refreshToken: resp?.refresh_token,
+        actorType: 'worker',
       });
       onDone();
     } catch (e) {
-      console.log('[WorkerRegisterStep] complete xatolik', e.message);
       setFinishError(e.message || "Ro'yxatdan o'tishni yakunlashda muammo yuz berdi");
     } finally {
       setLoading(false);

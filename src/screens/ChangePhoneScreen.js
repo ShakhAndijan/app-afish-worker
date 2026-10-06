@@ -17,16 +17,7 @@ import PhoneInput from '../components/login/PhoneInput';
 import { requestChangePhoneOtp, verifyChangePhoneOtp } from '../api/user';
 import SuccessModal from '../components/SuccessModal';
 
-const formatPhone = (raw = '') => {
-  const d = raw.replace(/\D/g, '').slice(0, 9);
-  let s = '';
-  if (d.length > 0) s += d.slice(0, 2);
-  if (d.length > 2) s += ' ' + d.slice(2, 5);
-  if (d.length > 5) s += ' ' + d.slice(5, 7);
-  if (d.length > 7) s += ' ' + d.slice(7, 9);
-  return s;
-};
-
+import { formatPhone } from '../utils/format';
 /* ── Themed 6-cell OTP input (same idea as login's OtpInput, adapted to
    light/dark via `t` since this screen lives inside the themed profile area) ── */
 function OtpCells({ value, onChange, t, length = 6 }) {

@@ -13,7 +13,7 @@ import { StatusBar } from 'expo-status-bar';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
-const fmt = (n) => Math.round(n).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+import { formatAmount } from '../utils/format';
 const toNumber = (price) => parseInt(String(price).replace(/\D/g, ''), 10) || 0;
 const BAR_COLORS = ['orange', 'blue', 'green', 'violet', 'gold', 'red'];
 
@@ -85,7 +85,7 @@ function PeriodDetailSheet({ visible, detail, onClose, onSelectWork, t }) {
                 {detail.amountLabel}
               </Text>
               <Text style={{ fontSize: 26, fontWeight: '800', color: '#fff', marginTop: 4 }}>
-                {fmt(detail.amount)} <Text style={{ fontSize: 14, fontWeight: '600' }}>so'm</Text>
+                {formatAmount(detail.amount)} <Text style={{ fontSize: 14, fontWeight: '600' }}>so'm</Text>
               </Text>
             </View>
 
@@ -338,16 +338,16 @@ export default function EarningsScreen({
   const sortedWorks = [...works].sort((a, b) => b.id - a.id);
 
   const periodStats = [
-    { icon: 'calendar-today', value: fmt(todayEarned), label: 'Bugun' },
-    { icon: 'calendar-week', value: fmt(weekTotal), label: 'Bu hafta' },
-    { icon: 'calendar-month-outline', value: fmt(thisMonth?.amount ?? 0), label: 'Bu oy' },
-    { icon: 'chart-line', value: fmt(weekAvg), label: "Kunlik o'rtacha" },
+    { icon: 'calendar-today', value: formatAmount(todayEarned), label: 'Bugun' },
+    { icon: 'calendar-week', value: formatAmount(weekTotal), label: 'Bu hafta' },
+    { icon: 'calendar-month-outline', value: formatAmount(thisMonth?.amount ?? 0), label: 'Bu oy' },
+    { icon: 'chart-line', value: formatAmount(weekAvg), label: "Kunlik o'rtacha" },
   ];
 
   const extraStats = [
     {
       icon: 'calculator-variant-outline',
-      label: `${fmt(avgPerJob)} so'm`,
+      label: `${formatAmount(avgPerJob)} so'm`,
       sub: 'Har bir ish uchun o\'rtacha narx',
     },
     ...(topJob
@@ -360,7 +360,7 @@ export default function EarningsScreen({
     ...(bestMonth
       ? [{
           icon: 'calendar-star',
-          label: `${fmt(bestMonth.amount)} so'm`,
+          label: `${formatAmount(bestMonth.amount)} so'm`,
           sub: `Eng daromadli oy — ${MONTH_SHORT[bestMonth.monthIdx]} ${bestMonth.year}`,
         }]
       : []),
@@ -409,7 +409,7 @@ export default function EarningsScreen({
             Butun vaqt davomida ishlab topilgan pul
           </Text>
           <Text style={s.heroAmt}>
-            {fmt(totalEarned)} <Text style={s.heroCur}>so'm</Text>
+            {formatAmount(totalEarned)} <Text style={s.heroCur}>so'm</Text>
           </Text>
           <Text style={{ fontSize: 11.5, color: 'rgba(255,255,255,0.85)', marginTop: 6 }}>
             {works.length} ta bajarilgan ish · Hisobingizda {balance} so'm
@@ -451,7 +451,7 @@ export default function EarningsScreen({
         <View style={[s.card, { backgroundColor: t.card, borderColor: t.border }]}>
           <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
             <Text style={{ fontSize: 13, color: t.muted }}>
-              Jami: <Text style={{ fontWeight: '800', color: t.text }}>{fmt(weekTotal)} so'm</Text>
+              Jami: <Text style={{ fontWeight: '800', color: t.text }}>{formatAmount(weekTotal)} so'm</Text>
             </Text>
             {!!bestDay && (
               <Text style={{ fontSize: 11, color: t.green, fontWeight: '700' }}>
@@ -494,7 +494,7 @@ export default function EarningsScreen({
             <View style={[s.card, { backgroundColor: t.card, borderColor: t.border }]}>
               <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
                 <Text style={{ fontSize: 13, color: t.muted }}>
-                  Jami: <Text style={{ fontWeight: '800', color: t.text }}>{fmt(totalEarned)} so'm</Text>
+                  Jami: <Text style={{ fontWeight: '800', color: t.text }}>{formatAmount(totalEarned)} so'm</Text>
                 </Text>
                 {!!bestMonth && (
                   <Text style={{ fontSize: 11, color: t.green, fontWeight: '700' }}>
@@ -511,7 +511,7 @@ export default function EarningsScreen({
                     onPress={() => openMonth(m)}
                   >
                     <Text style={{ fontSize: 8.5, color: t.faint, marginBottom: 4 }} numberOfLines={1}>
-                      {fmt(m.amount / 1000)}k
+                      {formatAmount(m.amount / 1000)}k
                     </Text>
                     <View
                       style={{
@@ -580,7 +580,7 @@ export default function EarningsScreen({
                         {c.name}
                       </Text>
                       <Text style={{ fontSize: 12, fontWeight: '800', color: t.text }}>
-                        {fmt(c.amount)} so'm
+                        {formatAmount(c.amount)} so'm
                       </Text>
                     </View>
                     <View style={[s.barTrack, { backgroundColor: t.rowIconBg }]}>

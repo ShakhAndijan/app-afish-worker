@@ -52,8 +52,8 @@ export default function TelegramLoginModal({ visible, botUsername, loading, onCl
                 try {
                   const data = JSON.parse(event.nativeEvent.data);
                   onAuth(data);
-                } catch (e) {
-                  console.log('[TelegramLoginModal] callback parse xatolik', e.message);
+                } catch {
+                  // Telegram'dan kelmagan/buzuq xabar — e'tiborsiz qoldiramiz.
                 }
               }}
             />

@@ -30,6 +30,7 @@ import {
 } from '../../api/auth';
 import { getGenders, getRegions, getDistricts } from '../../api/reference';
 
+import { formatPhone, MONTH_NAMES_UZ, pad2, daysInMonth } from '../../utils/format';
 const TOTAL_STEPS = 6;
 
 // Step render order: index+1 = step number shown to the user (progress bar, "N-QADAM").
@@ -167,14 +168,6 @@ const ct = StyleSheet.create({
 });
 
 // ─── Step 1: Phone ────────────────────────────────────────────────────────────
-const formatPhone = (raw) => {
-  const d = raw.replace(/\D/g, '').slice(0, 9);
-  let out = d.slice(0, 2);
-  if (d.length > 2) out += ' ' + d.slice(2, 5);
-  if (d.length > 5) out += ' ' + d.slice(5, 7);
-  if (d.length > 7) out += ' ' + d.slice(7, 9);
-  return out;
-};
 
 function StepPhone({ data, set, onNext, loading }) {
   const digits = data.phone.replace(/\D/g, '');
@@ -668,8 +661,6 @@ function StepPassport({ data, set, onNext, onExpire }) {
   );
 }
 
-const pad2 = (n) => String(n).padStart(2, '0');
-
 const parseBirthDate = (str) => {
   const m = /^(\d{2})\.(\d{2})\.(\d{4})$/.exec(str || '');
   if (!m) return null;
@@ -681,23 +672,6 @@ const parseBirthDate = (str) => {
   const d = new Date(year, month - 1, day);
   return Number.isNaN(d.getTime()) ? null : { day, month, year };
 };
-
-const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
-
-const MONTH_NAMES_UZ = [
-  'Yanvar',
-  'Fevral',
-  'Mart',
-  'Aprel',
-  'May',
-  'Iyun',
-  'Iyul',
-  'Avgust',
-  'Sentyabr',
-  'Oktyabr',
-  'Noyabr',
-  'Dekabr',
-];
 
 const DATE_ROW_H = 42;
 

@@ -22,6 +22,7 @@ import Feather from '@expo/vector-icons/Feather';
 import * as ImagePicker from 'expo-image-picker';
 import { useTheme } from '../context/ThemeContext';
 
+import { MONTH_NAMES_UZ, pad2, daysInMonth } from '../utils/format';
 const FIELD_OPTIONS = [
   { name: 'Santexnika', icon: 'wrench', color: '#2fa37a' },
   { name: 'Elektr montaji', icon: 'lightning-bolt', color: '#e87a45' },
@@ -31,12 +32,6 @@ const FIELD_OPTIONS = [
   { name: 'Boshqa', icon: 'certificate-outline', color: '#6c7f9a' },
 ];
 
-const MONTH_NAMES_UZ = [
-  'Yanvar', 'Fevral', 'Mart', 'Aprel', 'May', 'Iyun',
-  'Iyul', 'Avgust', 'Sentabr', 'Oktabr', 'Noyabr', 'Dekabr',
-];
-const pad2 = (n) => String(n).padStart(2, '0');
-const daysInMonth = (year, month) => new Date(year, month, 0).getDate();
 const formatDate = (d) => (d ? `${pad2(d.day)}.${pad2(d.month)}.${d.year}` : '');
 
 /* ── Minimal iOS-style photo source sheet (same language as AvatarPickerSheet) ── */

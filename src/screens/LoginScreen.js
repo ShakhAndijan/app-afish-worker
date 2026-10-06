@@ -14,7 +14,7 @@ import {
   requestResetPasswordOtp,
   verifyResetPasswordOtp,
 } from '../api/auth';
-import { saveToken, saveRefreshToken, saveActorType } from '../utils/token';
+import { saveSession } from '../utils/token';
 import PhoneOtpStep from './steps/PhoneOtpStep';
 import PhoneStep from './steps/PhoneStep';
 import ForgotPasswordStep from './steps/ForgotPasswordStep';
@@ -63,7 +63,6 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
         setTelegramEnabled(!!cfg?.enabled);
         setTelegramBotUsername(cfg?.bot_username || '');
       } catch (e) {
-        console.log('[LoginScreen] telegram config olishda xatolik', e.message);
         setTelegramEnabled(false);
       } finally {
         setTelegramConfigLoading(false);
@@ -76,16 +75,13 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
 
   const handleRequestOtp = async () => {
     const channel = identifierMode === 'email' ? null : 'sms';
-    console.log('[LoginScreen] 1-jarayon: kod so\'ralmoqda', { identifier: identifier(), identifierMode, actorType });
     try {
       setOtpLoading(true);
       setOtpRequestError('');
       const data = await authStart(identifier(), channel, actorType);
       setOtpDevCode(data?.dev_code || '');
-      console.log('[LoginScreen] kod yuborildi -> "code" bosqichiga o\'tildi');
       setStep('code');
     } catch (e) {
-      console.log('[LoginScreen] kod so\'rashda xatolik', e.message);
       setOtpRequestError(e.message || 'Kod yuborishda xatolik yuz berdi');
     } finally {
       setOtpLoading(false);
@@ -94,14 +90,12 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
 
   const handleResendOtp = async () => {
     const channel = identifierMode === 'email' ? null : 'sms';
-    console.log('[LoginScreen] kod qayta so\'ralmoqda', { identifier: identifier(), identifierMode, actorType });
     try {
       setOtpResendLoading(true);
       setOtpConfirmError('');
       const data = await authStart(identifier(), channel, actorType);
       setOtpDevCode(data?.dev_code || '');
     } catch (e) {
-      console.log('[LoginScreen] kod qayta so\'rashda xatolik', e.message);
       Alert.alert('Xato', e.message || 'Kod yuborishda xatolik yuz berdi');
     } finally {
       setOtpResendLoading(false);
@@ -110,40 +104,37 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
 
   const handleTelegramPress = () => {
     if (!telegramBotUsername) return;
-    console.log('[LoginScreen] Telegram login ochilmoqda', { botUsername: telegramBotUsername, actorType });
     setTelegramModalVisible(true);
   };
 
   const handleTelegramAuth = async (widgetData) => {
-    console.log('[LoginScreen] Telegram widget javob berdi', widgetData);
     try {
       const data = await telegramVerify(actorType, widgetData);
-      if (data?.access_token) await saveToken(data.access_token);
-      if (data?.refresh_token) await saveRefreshToken(data.refresh_token);
       const finalActorType = data?.actor_type || actorType;
-      await saveActorType(finalActorType);
+      await saveSession({
+        accessToken: data?.access_token,
+        refreshToken: data?.refresh_token,
+        actorType: finalActorType,
+      });
       setTelegramModalVisible(false);
-      console.log('[LoginScreen] Telegram orqali kirildi', { actorType: finalActorType });
       (onLoginSuccess ?? onBack)(finalActorType);
     } catch (e) {
-      console.log('[LoginScreen] Telegram verify xatolik', e.message);
       setTelegramModalVisible(false);
       Alert.alert('Xato', e.message || 'Telegram orqali kirishda xatolik');
     }
   };
 
   const handleConfirmOtp = async (code) => {
-    console.log('[LoginScreen] 2-jarayon: kod tasdiqlanmoqda', { identifier: identifier(), code, actorType });
     try {
       setOtpConfirmLoading(true);
       setOtpConfirmError('');
       const data = await authVerify(identifier(), code, actorType);
-      console.log('[LoginScreen] 3-jarayon: verify natijasi', { status: data?.status });
       if (data?.status === 'signed_in') {
-        if (data.access_token) await saveToken(data.access_token);
-        if (data.refresh_token) await saveRefreshToken(data.refresh_token);
-        await saveActorType(actorType);
-        console.log('[LoginScreen] hisob mavjud edi -> to\'g\'ridan-to\'g\'ri kirildi');
+        await saveSession({
+          accessToken: data.access_token,
+          refreshToken: data.refresh_token,
+          actorType,
+        });
         (onLoginSuccess ?? onBack)(actorType);
         return;
       }
@@ -154,21 +145,16 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
       // yangi hisob -> foydalanuvchidan so'raymiz. Claim endpointi
       // ishlatilmaydi.
       if (data?.suggested_first_name && data?.suggested_last_name) {
-        console.log('[LoginScreen] ism-familiya allaqachon ma\'lum -> avtomatik yakunlanmoqda', {
-          firstName: data.suggested_first_name,
-          lastName: data.suggested_last_name,
-        });
         const resp = await authComplete(
           data.ticket,
           data.suggested_first_name,
           data.suggested_last_name,
           actorType
         );
-        if (resp?.access_token) await saveToken(resp.access_token);
-        if (resp?.refresh_token) await saveRefreshToken(resp.refresh_token);
-        await saveActorType(actorType);
-        console.log('[LoginScreen] avtomatik ro\'yxatdan o\'tish tugadi -> kirildi', {
-          already_registered: resp?.already_registered,
+        await saveSession({
+          accessToken: resp?.access_token,
+          refreshToken: resp?.refresh_token,
+          actorType,
         });
         (onLoginSuccess ?? onBack)(actorType);
         return;
@@ -176,15 +162,12 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
 
       if (data?.ticket) {
         setTicket(data.ticket);
-        console.log('[LoginScreen] yangi hisob -> "register" (ism-familiya) bosqichiga o\'tildi');
         setStep('register');
         return;
       }
 
-      console.log('[LoginScreen] kutilmagan status', data?.status);
       setOtpConfirmError('Kutilmagan javob qaytdi');
     } catch (e) {
-      console.log('[LoginScreen] kod tasdiqlashda xatolik', e.message);
       setOtpConfirmError(e.message || 'Tasdiqlashda xatolik yuz berdi');
     } finally {
       setOtpConfirmLoading(false);
@@ -196,9 +179,11 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
       setLoginLoading(true);
       setLoginError('');
       const data = await loginWorker(fullPhone(), password);
-      if (data?.access_token) await saveToken(data.access_token);
-      if (data?.refresh_token) await saveRefreshToken(data.refresh_token);
-      await saveActorType(actorType);
+      await saveSession({
+        accessToken: data?.access_token,
+        refreshToken: data?.refresh_token,
+        actorType,
+      });
       (onLoginSuccess ?? onBack)(actorType);
     } catch (e) {
       setLoginError(e.message || 'Kirishda xatolik yuz berdi');
@@ -258,9 +243,7 @@ export default function LoginScreen({ onBack, onLoginSuccess }) {
     try {
       setGoogleLoading(true);
       const { token, refreshToken } = await googleLogin(actorType);
-      if (token) await saveToken(token);
-      if (refreshToken) await saveRefreshToken(refreshToken);
-      await saveActorType(actorType);
+      await saveSession({ accessToken: token, refreshToken, actorType });
       (onLoginSuccess ?? onBack)(actorType);
     } catch (e) {
       if (e.message !== 'cancelled') {

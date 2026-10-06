@@ -10,6 +10,9 @@
       "android": {
         "buildType": "apk",
         "credentialsSource": "local"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://dev-back.afish.uz"
       }
     },
     "preview": {
@@ -17,6 +20,9 @@
       "android": {
         "buildType": "apk",
         "credentialsSource": "local"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://dev-back.afish.uz"
       }
     },
     "production": {
