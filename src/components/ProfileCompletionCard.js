@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useProfileCompletion } from '../hooks/useProfileCompletion';
 
-// Usta profilini to'ldirish holatini ko'rsatadigan karta — UstaMainScreen
+// Usta profilini to'ldirish holatini ko'rsatadigan karta — UstaHomeScreen
 // (Asosiy tab) va UstaProfileScreen'da bir xil ko'rinishda ishlatiladi.
 export default function ProfileCompletionCard({ user, theme: t, onPressComplete }) {
   const { checklist, checklistDone, profilePercent, isComplete } = useProfileCompletion(user);

@@ -6,7 +6,7 @@ export const PROFILE_CHECKLIST = [
 ];
 
 // Usta profilining "buyurtma qabul qilish"ga tayyorligini hisoblaydi —
-// UstaMainScreen (onlayn tugmasi) va UstaProfileScreen (ogohlantirish) shu
+// UstaHomeScreen (onlayn tugmasi) va UstaProfileScreen (ogohlantirish) shu
 // bitta hisobga tayanadi.
 export function useProfileCompletion(user) {
   const checklistDone = {

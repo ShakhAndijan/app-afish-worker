@@ -33,14 +33,6 @@ import ChangePhoneScreen from './ChangePhoneScreen';
 import CertificatesScreen from './CertificatesScreen';
 import TilBottomSheet, { LANGS } from '../components/TilBottomSheet';
 import AvatarPickerSheet from '../components/AvatarPickerSheet';
-import BottomNav from '../components/BottomNav';
-
-const USTA_TABS = [
-  { key: 'home', label: 'Asosiy', on: 'home', off: 'home-outline' },
-  { key: 'orders', label: 'Buyurtmalar', on: 'grid', off: 'grid-outline' },
-  { key: 'wallet', label: 'Hamyon', on: 'wallet', off: 'wallet-outline' },
-  { key: 'profile', label: 'Profil', on: 'person', off: 'person-outline' },
-];
 
 const formatPhoneDisplay = (raw = '') => {
   let d = raw.replace(/\D/g, '');
@@ -155,7 +147,7 @@ function SettingsRow({ icon, label, value, danger, color, onPress, t }) {
   );
 }
 
-export default function UstaProfileScreen({ onTabChange, onLogout, onOpenEarnings }) {
+export default function UstaProfileScreen({ onLogout, onOpenEarnings }) {
   const { theme: t, toggleTheme } = useTheme();
   const { user, refreshUser } = useUser();
   const { isComplete: profileComplete } = useProfileCompletion(user);
@@ -770,16 +762,6 @@ export default function UstaProfileScreen({ onTabChange, onLogout, onOpenEarning
         </View>
       </ScrollView>
 
-      {/* ── Bottom Nav ── */}
-      <BottomNav
-        activeTab="profile"
-        onTabChange={onTabChange}
-        tabs={USTA_TABS}
-        accent={t.orange}
-        background={t.navBg}
-        border={t.border}
-        muted={t.faint}
-      />
       <TilBottomSheet
         visible={showTil}
         currentLang={lang}

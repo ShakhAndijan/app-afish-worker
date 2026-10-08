@@ -11,20 +11,12 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import BottomNav from '../components/BottomNav';
-
-const USTA_TABS = [
-  { key: 'home', label: 'Asosiy', on: 'home', off: 'home-outline' },
-  { key: 'orders', label: 'Buyurtmalar', on: 'grid', off: 'grid-outline' },
-  { key: 'wallet', label: 'Hamyon', on: 'wallet', off: 'wallet-outline' },
-  { key: 'profile', label: 'Profil', on: 'person', off: 'person-outline' },
-];
 
 // Usta rad etsa yoki qabul qilsa e'lon ro'yxatdan olib tashlanadi — qabul
 // qilinganda mijoz shu ustaga eksklyuziv bog'lanadi (boshqa ustaga
 // buyurtma bera olmay qoladi), shu sabab tasdiqlash xabarida shu alohida
 // ta'kidlanadi.
-export default function BuyurtmalarScreen({ t, categories = [], elonlar = [], onTabChange }) {
+export default function BuyurtmalarScreen({ t, categories = [], elonlar = [] }) {
   const [list, setList] = useState(elonlar);
   const [activeCategory, setActiveCategory] = useState('Barchasi');
 
@@ -185,16 +177,6 @@ export default function BuyurtmalarScreen({ t, categories = [], elonlar = [], on
         )}
       </ScrollView>
 
-      <BottomNav
-        activeTab="orders"
-        onTabChange={onTabChange}
-        tabs={USTA_TABS}
-        accent={t.orange}
-        background={t.navBg}
-        border={t.border}
-        muted={t.faint}
-        ringColor={t.bg}
-      />
     </SafeAreaView>
   );
 }
